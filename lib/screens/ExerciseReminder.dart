@@ -30,7 +30,7 @@ class ExerciseReminder extends StatelessWidget {
               active: false,
             ),
             navItem(
-              icon:  Icons.fitness_center,
+              icon:  Icons.notifications_outlined,
               title: "ALERTS",
               active: true,
             ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/CameraSetup.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/HomeDashboard.dart';
+import 'package:my_app/screens/CognitiveGame.dart';
+import 'package:my_app/screens/Progress&Achievements.dart';
 
 class PhysicalRehabExercises extends StatelessWidget {
   const PhysicalRehabExercises({super.key});
@@ -182,52 +185,87 @@ class PhysicalRehabExercises extends StatelessWidget {
         ),
       ),
 
-      bottomNavigationBar: Container(
-        height: 82,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+    bottomNavigationBar: Container(
+  height: 82,
+  padding: const EdgeInsets.symmetric(horizontal: 12),
 
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-            ),
-          ],
-        ),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.04),
+        blurRadius: 10,
+      ),
+    ],
+  ),
 
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
 
-            navItem(
-              icon: Icons.home_outlined,
-              title: "Home",
-              active: false,
-            ),
-
-            navItem(
-              icon: Icons.back_hand,
-              title: "Exercises",
-              active: true,
-            ),
-
-            navItem(
-              icon: Icons.psychology_outlined,
-              title: "Games",
-              active: false,
-            ),
-
-            navItem(
-              icon: Icons.auto_graph,
-              title: "Progress",
-              active: false,
-            ),
-          ],
+      GestureDetector(
+        onTap: () {
+          Navigator.pushAndRemoveUntil(
+  context,
+  MaterialPageRoute(
+    builder: (context) => const HomeDashboard(),
+  ),
+  (route) => false,
+);
+        },
+        child: navItem(
+          icon: Icons.home_outlined,
+          title: "Home",
+          active: false,
         ),
       ),
-    );
+
+      GestureDetector(
+        onTap: () {},
+        child: navItem(
+          icon: Icons.back_hand,
+          title: "Exercises",
+          active: true,
+        ),
+      ),
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CognitiveGame(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.psychology_outlined,
+          title: "Games",
+          active: false,
+        ),
+      ),
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProgressAchievements(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.auto_graph,
+          title: "Progress",
+          active: false,
+        ),
+      ),
+    ],
+  ),
+),
+);
   }
+
 
   Widget filterButton({
     required String title,

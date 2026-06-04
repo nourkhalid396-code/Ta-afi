@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/PhysicalRehabExercises.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/CognitiveGame.dart';
+import 'package:my_app/screens/Progress&Achievements.dart';
 
 class HomeDashboard extends StatelessWidget {
   const HomeDashboard({super.key});
@@ -403,44 +405,73 @@ class HomeDashboard extends StatelessWidget {
       ),
 
       bottomNavigationBar: Container(
-        height: 90,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-        ),
-
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
-
-        child: Row(
-          mainAxisAlignment:
-              MainAxisAlignment.spaceAround,
-
-          children: [
-            navItem(
-              icon: Icons.home,
-              label: "Home",
-              active: true,
-            ),
-
-            navItem(
-              icon:
-                  Icons.back_hand_outlined,
-              label: "Exercises",
-            ),
-
-            navItem(
-              icon: Icons.psychology_outlined,
-              label: "Games",
-            ),
-
-            navItem(
-              icon: Icons.auto_graph,
-              label: "Progress",
-            ),
-          ],
+  height: 90,
+  padding: const EdgeInsets.symmetric(horizontal: 12),
+  decoration: const BoxDecoration(
+    color: Colors.white,
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
+      GestureDetector(
+        onTap: () {
+          Navigator.popUntil(context, (route) => route.isFirst);
+        },
+        child: navItem(
+          icon: Icons.home,
+          label: "Home",
+          active: true,
         ),
       ),
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PhysicalRehabExercises(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.back_hand_outlined,
+          label: "Exercises",
+        ),
+      ),
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CognitiveGame(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.psychology_outlined,
+          label: "Games",
+        ),
+      ),
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const ProgressAchievements(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.auto_graph,
+          label: "Progress",
+        ),
+      ),
+    ],
+  ),
+),
     );
   }
 

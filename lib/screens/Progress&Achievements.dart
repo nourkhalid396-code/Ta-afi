@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/screens/HomeDashboard.dart';
+import 'package:my_app/screens/PhysicalRehabExercises.dart';
+import 'package:my_app/screens/CognitiveGame.dart';
 
 void main() {
   runApp(const MyApp());
@@ -437,30 +440,66 @@ class ProgressAchievements extends StatelessWidget {
 
                         children: [
 
-                          bottomItem(
-                            Icons.home_outlined,
-                            "Home",
-                            false,
-                          ),
+                        GestureDetector(
+                         onTap: () {
+                      Navigator.pushAndRemoveUntil(
+                       context,
+                        MaterialPageRoute(
+                       builder: (context) => const HomeDashboard(),
+                        ),
+                      (route) => false,
+                        );
+                       },
+                        child: bottomItem(
+                        Icons.home,
+                        "Home",
+                        false,
+                        ),
+                       ),
 
-                          bottomItem(
-                            Icons.back_hand_outlined,
-                            "Exercises",
-                            false,
+                       GestureDetector(
+                        onTap: () {
+                         Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                          const PhysicalRehabExercises(),
+                         ),
+                        );
+                       },
+                       child: bottomItem(
+                        Icons.back_hand_outlined,
+                          "Exercises",
+                           false,
                           ),
+                         ),
 
-                          bottomItem(
-                            Icons.sports_esports_outlined,
-                            "Games",
-                            false,
-                          ),
+                      GestureDetector(
+                       onTap: () {
+                        Navigator.push(
+                         context,
+                         MaterialPageRoute(
+                          builder: (context) =>
+                           const CognitiveGame(),
+                         ),
+                        );
+                       },
+                      child: bottomItem(
+                       Icons.psychology_outlined,
+                       "Games",
+                         false,
+                       ),
+                     ),
 
-                          bottomItem(
-                            Icons.auto_graph,
-                            "Progress",
-                            true,
-                          ),
-                        ],
+                      GestureDetector(
+                       onTap: () {},
+                        child: bottomItem(
+                         Icons.auto_graph,
+                          "Progress",
+                             true,
+                           ),
+                         ),
+                       ],
                       ),
                     ),
 

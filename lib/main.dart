@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/SplashScreen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/DailyGoalStatus.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/HomeDashboard.dart';
+import 'package:my_app/screens/PhysicalRehabExercises.dart';
+import 'package:my_app/screens/Progress&Achievements.dart';
 
 class CognitiveGame extends StatelessWidget {
   const CognitiveGame({super.key});
@@ -188,39 +191,76 @@ class CognitiveGame extends StatelessWidget {
       ),
 
       bottomNavigationBar: Container(
-        height: 82,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: const BoxDecoration(color: Colors.white),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            navItem(
-              icon: Icons.home_outlined,
-              title: "Home",
-              active: false,
-            ),
+  height: 82,
+  padding: const EdgeInsets.symmetric(horizontal: 12),
+  decoration: const BoxDecoration(
+    color: Colors.white,
+  ),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceAround,
+    children: [
 
-            navItem(
-              icon: Icons.back_hand_outlined,
-              title: "Exercises",
-              active: false,
-            ),
-
-            navItem(
-              icon: Icons.psychology,
-              title: "Games",
-              active: true,
-            ),
-
-            navItem(
-              icon: Icons.auto_graph,
-              title: "Progress",
-              active: false,
-            ),
-          ],
+      GestureDetector(
+        onTap: () {
+          Navigator.pushAndRemoveUntil(
+  context,
+  MaterialPageRoute(
+    builder: (context) => const HomeDashboard(),
+  ),
+  (route) => false,
+);
+        },
+        child: navItem(
+          icon: Icons.home_outlined,
+          title: "Home",
+          active: false,
         ),
       ),
-    );
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PhysicalRehabExercises(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.back_hand_outlined,
+          title: "Exercises",
+          active: false,
+        ),
+      ),
+
+      GestureDetector(
+        onTap: () {},
+        child: navItem(
+          icon: Icons.psychology,
+          title: "Games",
+          active: true,
+        ),
+      ),
+
+      GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ProgressAchievements(),
+            ),
+          );
+        },
+        child: navItem(
+          icon: Icons.auto_graph,
+          title: "Progress",
+          active: false,
+        ),
+      ),
+    ],
+  ),
+),
+);
   }
 
   Widget topCard({
