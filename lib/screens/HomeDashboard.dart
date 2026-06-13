@@ -3,6 +3,7 @@ import 'package:my_app/screens/PhysicalRehabExercises.dart';
 import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/CognitiveGame.dart';
 import 'package:my_app/screens/Progress&Achievements.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 class HomeDashboard extends StatelessWidget {
   const HomeDashboard({super.key});
@@ -11,27 +12,6 @@ class HomeDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffFAFAFA),
-
-      floatingActionButton: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: const Color(0xff934800),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 34,
-        ),
-      ),
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -67,13 +47,23 @@ class HomeDashboard extends StatelessWidget {
                             ),
                           ),
 
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/Avatar1 .png',
-                              fit: BoxFit.cover,
-                            ),
+                          child: GestureDetector(
+                          onTap: () {
+                           Navigator.push(
+                            context,
+                           MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
                           ),
+                         );
+                        },
+                          child: ClipOval(
+                          child: Image.asset(
+                           'assets/images/Avatar1 .png',
+                          fit: BoxFit.cover,
+                         ),
                         ),
+                       ),
+                      ),
 
                         const SizedBox(width: 12),
 
@@ -303,33 +293,40 @@ class HomeDashboard extends StatelessWidget {
                       },
 
                       child: buildFeatureCard(
-                        iconBg: AppColors
-                            .accentColor
-                            .withOpacity(0.15),
-
-                        iconColor:
-                            const Color(0xff0D6C1E),
-
-                        icon: Icons.back_hand,
-
-                        title: "Physical Rehab",
-
-                        titleColor:
-                            const Color(0xff1A1C1C),
-
-                        description:
-                            "Gentle motor skill recovery focused\non hand and wrist flexibility.",
-
-                        footer: "12 Exercises",
-
-                        footerColor:
-                            const Color(0xff0D6C1E),
+                      context,
+                      onTap: () {
+                       Navigator.push(
+                        context,
+                       MaterialPageRoute(
+                        builder: (_) =>
+                        const PhysicalRehabExercises(),
+                        ),
+                       );
+                      },
+                      iconBg: AppColors.accentColor.withOpacity(0.15),
+                      iconColor: const Color(0xff0D6C1E),
+                      icon: Icons.back_hand,
+                      title: "Physical Rehab",
+                      titleColor: const Color(0xff1A1C1C),
+                      description:
+                       "Gentle motor skill recovery focused\non hand and wrist flexibility.",
+                       footer: "12 Exercises",
+                       footerColor: const Color(0xff0D6C1E),
                       ),
                     ),
 
                     const SizedBox(height: 24),
 
                     buildFeatureCard(
+                       context,
+                        onTap: () {
+                         Navigator.push(
+                          context,
+                         MaterialPageRoute(
+                          builder: (_) => const CognitiveGame(),
+                         ),
+                        );
+                       },
                       iconBg:
                           Colors.blue.withOpacity(0.12),
 
@@ -475,7 +472,9 @@ class HomeDashboard extends StatelessWidget {
     );
   }
 
-  Widget buildFeatureCard({
+  Widget buildFeatureCard(
+  BuildContext context, {
+    required VoidCallback onTap,
     required Color iconBg,
     required Color iconColor,
     required IconData icon,
@@ -539,28 +538,28 @@ class HomeDashboard extends StatelessWidget {
 
           const SizedBox(height: 22),
 
-          Row(
-            children: [
+          GestureDetector(
+           onTap: onTap,
+           child: Row(
+            mainAxisSize: MainAxisSize.min,
+             children: [
               Text(
-                footer,
-
-                style: AppTextStyles
-                    .bodyLarge
-                    .copyWith(
-                  color: footerColor,
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(width: 6),
-
-              Icon(
-                Icons.arrow_forward,
+               footer,
+              style: AppTextStyles.bodyLarge.copyWith(
                 color: footerColor,
-              ),
-            ],
-          ),
+                 fontWeight: FontWeight.bold,
+                 ),
+               ),
+
+      const SizedBox(width: 6),
+
+      Icon(
+        Icons.arrow_forward,
+        color: footerColor,
+      ),
+    ],
+  ),
+),
         ],
       ),
     );

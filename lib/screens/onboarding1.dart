@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/onboarding2.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/login.dart';
 
 class Onboarding1 extends StatelessWidget {
   const Onboarding1({super.key});
@@ -51,15 +52,23 @@ class Onboarding1 extends StatelessWidget {
                         ),
                       ),
 
-                      Text(
-                        "Skip",
-                        style:
-                            AppTextStyles.bodyMedium
-                                .copyWith(
-                          color: AppColors.textColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                     GestureDetector(
+                      onTap: () {
+                     Navigator.pushReplacement(
+                       context,
+                     MaterialPageRoute(
+                      builder: (context) => const Login(),
                       ),
+                     );
+                    },
+                     child: Text(
+                      "Skip",
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textColor,
+                     fontWeight: FontWeight.w600,
+                    ),
+                   ),
+                  ),
                     ],
                   ),
 

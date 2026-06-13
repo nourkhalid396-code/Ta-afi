@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/Progress&Achievements.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -67,11 +68,21 @@ class OfflineSaveScreen extends StatelessWidget {
 
                       const Spacer(),
 
-                      const CircleAvatar(
-                        radius: 22,
-                        backgroundImage: AssetImage(
-                          'assets/images/Avatar7.png',
+                      GestureDetector(
+                      onTap: () {
+                       Navigator.push(
+                        context,
+                       MaterialPageRoute(
+                        builder: (context) => const ProfileScreen(),
                         ),
+                       );
+                     },
+                      child: const CircleAvatar(
+                       radius: 22,
+                      backgroundImage: AssetImage(
+                        'assets/images/Avatar7.png',
+                        ),
+                       ),
                       ),
                     ],
                   ),

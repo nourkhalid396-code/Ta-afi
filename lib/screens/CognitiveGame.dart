@@ -4,6 +4,7 @@ import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/HomeDashboard.dart';
 import 'package:my_app/screens/PhysicalRehabExercises.dart';
 import 'package:my_app/screens/Progress&Achievements.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 class CognitiveGame extends StatelessWidget {
   const CognitiveGame({super.key});
@@ -23,10 +24,22 @@ class CognitiveGame extends StatelessWidget {
                 color: Colors.white,
                 child: Row(
                   children: [
-                    const CircleAvatar(
+                    GestureDetector(
+                    onTap: () {
+                     Navigator.push(
+                      context,
+                     MaterialPageRoute(
+                       builder: (context) => const ProfileScreen(),
+                       ),
+                      );
+                     },
+                     child: const CircleAvatar(
                       radius: 16,
-                      backgroundImage: AssetImage('assets/images/Avatar5.png'),
-                    ),
+                       backgroundImage: AssetImage(
+                        'assets/images/Avatar5.png',
+                        ),
+                       ),
+                      ),
                     const SizedBox(width: 10),
                     Text(
                       "Ta'afi",

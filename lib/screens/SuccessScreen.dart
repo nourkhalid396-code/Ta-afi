@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/CognitiveGame.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
+import 'package:my_app/screens/HomeDashboard.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
@@ -39,11 +41,21 @@ class SuccessScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const CircleAvatar(
-                      radius: 18,
-                      backgroundImage: AssetImage(
-                        'assets/images/Avatar4 .png',
+                    GestureDetector(
+                    onTap: () {
+                     Navigator.push(
+                      context,
+                     MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
                       ),
+                     );
+                    }, 
+                    child: const CircleAvatar(
+                     radius: 18,
+                      backgroundImage: AssetImage(
+                       'assets/images/Avatar4 .png',
+                      ),
+                     ),
                     ),
                   ],
                 ),
@@ -277,8 +289,16 @@ class SuccessScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 14),
-
-                    Container(
+                    GestureDetector(
+                     onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                    MaterialPageRoute(
+                       builder: (_) => const HomeDashboard(),
+                      ),
+                    );
+                  },
+                    child:Container(
                       width: double.infinity,
                       height: 60,
                       decoration: BoxDecoration(
@@ -297,7 +317,7 @@ class SuccessScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
+                   ),
                     const SizedBox(height: 24),
 
                     Container(

@@ -4,6 +4,7 @@ import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/HomeDashboard.dart';
 import 'package:my_app/screens/CognitiveGame.dart';
 import 'package:my_app/screens/Progress&Achievements.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 class PhysicalRehabExercises extends StatelessWidget {
   const PhysicalRehabExercises({super.key});
@@ -34,20 +35,31 @@ class PhysicalRehabExercises extends StatelessWidget {
                 child: Row(
                   children: [
 
-                    Container(
-                      width: 32,
-                      height: 32,
+                    GestureDetector(
+                    onTap: () {
+                     Navigator.push(
+                      context,
+                     MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                     ),
+                   );
+                 },
 
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: const DecorationImage(
-                          image: AssetImage(
-                            'assets/images/Avatar2.png',
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+                   child: Container(
+                   width: 32,
+                   height: 32,
+
+                  decoration: const BoxDecoration(
+                   shape: BoxShape.circle,
+                    image: DecorationImage(
+                       image: AssetImage(
+                       'assets/images/Avatar2.png',
+                       ),
+                   fit: BoxFit.cover,
+                   ),
+                 ),
+               ),
+             ),
 
                     const SizedBox(width: 8),
 

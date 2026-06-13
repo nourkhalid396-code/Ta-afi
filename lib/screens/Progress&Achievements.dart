@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_app/screens/HomeDashboard.dart';
 import 'package:my_app/screens/PhysicalRehabExercises.dart';
 import 'package:my_app/screens/CognitiveGame.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,12 +47,22 @@ class ProgressAchievements extends StatelessWidget {
                     children: [
 
                       /// LEFT IMAGE
-                      const CircleAvatar(
-                        radius: 22,
-                        backgroundImage: AssetImage(
-                          'assets/images/Avatar8.png',
+                      GestureDetector(
+                      onTap: () {
+                       Navigator.push(
+                        context,
+                       MaterialPageRoute(
+                         builder: (context) => const ProfileScreen(),
                         ),
+                       );
+                      },
+                      child: const CircleAvatar(
+                      radius: 22,
+                      backgroundImage: AssetImage(
+                       'assets/images/Avatar8.png',
+                       ),
                       ),
+                     ),
 
                       const Spacer(),
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/onboarding3.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/login.dart';
 
 class Onboarding2 extends StatelessWidget {
   const Onboarding2({super.key});
@@ -192,8 +193,16 @@ class Onboarding2 extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 18),
-
-                  Center(
+                  GestureDetector(
+                   onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                    MaterialPageRoute(
+                      builder: (_) => const Login(),
+                     ),
+                    );
+                   },
+                  child: Center(
                     child: Text(
                       "Skip for now",
 
@@ -207,7 +216,7 @@ class Onboarding2 extends StatelessWidget {
                       ),
                     ),
                   ),
-
+                ),
                   const SizedBox(height: 34),
                 ],
               ),

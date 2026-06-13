@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/ExerciseReminder.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 class DailyGoalStatus extends StatelessWidget {
   const DailyGoalStatus({super.key});
@@ -26,12 +27,22 @@ class DailyGoalStatus extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage(
-                        'assets/images/Avatar6.png',
-                      ),
+                    GestureDetector(
+                    onTap: () {
+                    Navigator.push(
+                     context,
+                    MaterialPageRoute(
+                     builder: (context) => const ProfileScreen(),
                     ),
+                   );
+                 },
+                  child: const CircleAvatar(
+                   radius: 20,
+                  backgroundImage: AssetImage(
+                   'assets/images/Avatar6.png',
+                   ),
+                  ),
+                 ),
                     const Spacer(),
                     Text(
                       "Daily Progress",

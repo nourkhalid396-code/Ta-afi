@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 import 'MemoryGames.dart';
 import 'package:my_app/theme/app_theme.dart';
 
-class ExerciseReminder extends StatelessWidget {
+class ExerciseReminder extends StatefulWidget {
   const ExerciseReminder({super.key});
+
+  @override
+  State<ExerciseReminder> createState() =>
+      _ExerciseReminderState();
+}
+
+class _ExerciseReminderState
+    extends State<ExerciseReminder> {
+
+  bool notificationsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
@@ -311,40 +321,21 @@ class ExerciseReminder extends StatelessWidget {
                         ),
                       ),
 
-                      Container(
-                        width: 56,
-                        height: 30,
+                      Switch(
+                       value: notificationsEnabled,
+                      onChanged: (value) {
+                       setState(() {
+                         notificationsEnabled = value;
+                         });
+                        },
 
-                        decoration:
-                            BoxDecoration(
-                          color: const Color(
-                              0xff934800),
-                          borderRadius:
-                              BorderRadius
-                                  .circular(20),
-                        ),
-
-                        child: Align(
-                          alignment:
-                              Alignment
-                                  .centerRight,
-
-                          child: Container(
-                            margin:
-                                const EdgeInsets
-                                    .all(4),
-                            width: 22,
-                            height: 22,
-
-                            decoration:
-                                const BoxDecoration(
-                              color:
-                                  Colors.white,
-                              shape:
-                                  BoxShape.circle,
-                            ),
-                          ),
-                        ),
+                      activeColor: Colors.white,
+                       activeTrackColor:
+                        const Color(0xff934800),
+                       inactiveThumbColor:
+                        Colors.white,
+                       inactiveTrackColor:
+                        Colors.grey.shade300,
                       ),
                     ],
                   ),

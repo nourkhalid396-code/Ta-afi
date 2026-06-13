@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/ActiveTrackingSession.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/ProfileScreen.dart';
 
 class CameraSetup extends StatelessWidget {
   const CameraSetup({super.key});
@@ -32,13 +33,23 @@ class CameraSetup extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
 
-                  const CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: AssetImage(
-                      'assets/images/Avatar3.png',
-                    ),
-                  ),
+                  GestureDetector(
+                  onTap: () {
+                   Navigator.push(
+                    context,
+                   MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                   ),
+                  );
+                 },
+                 child: const CircleAvatar(
+                 radius: 16,
+                 backgroundColor: Colors.transparent,
+                 backgroundImage: AssetImage(
+                 'assets/images/Avatar3.png',
+                 ),
+                ),
+               ),
 
                   Text(
                     "Ta'afi",

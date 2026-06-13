@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/screens/Homedashboard.dart';
 import 'package:my_app/theme/app_theme.dart';
+import 'package:my_app/screens/ForgetScreen.dart';
+import 'package:my_app/screens/SignUp.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
@@ -237,20 +239,25 @@ class Login extends StatelessWidget {
                     const SizedBox(height: 14),
 
                     Align(
-                      alignment: Alignment.centerRight,
-
-                      child: Text(
-                        "Forgot Password?",
-
-                        style:
-                            AppTextStyles.bodyMedium
-                                .copyWith(
-                          color:
-                              const Color(0xff005FAF),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                     alignment: Alignment.centerRight,
+                       child: GestureDetector(
+                       onTap: () {
+                        Navigator.push(
+                        context,
+                         MaterialPageRoute(
+                          builder: (_) => const ForgetScreen(),
+                          ),
+                         );
+                        },
+                          child: Text(
+                           "Forgot Password?",
+                            style: AppTextStyles.bodyMedium.copyWith(
+                            color: const Color(0xff005FAF),
+                            fontWeight: FontWeight.w600,
+                            ),
+                           ),
+                          ),
+                         ),
 
                     const SizedBox(height: 34),
 
@@ -319,35 +326,34 @@ class Login extends StatelessWidget {
               const SizedBox(height: 42),
 
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
-
-                children: [
-
+                mainAxisAlignment: MainAxisAlignment.center,
+                 children: [
                   Text(
-                    "New to Ta'afi? ",
-
-                    style:
-                        AppTextStyles.bodyLarge
-                            .copyWith(
-                      color: AppColors.textColor,
-                    ),
+                   "New to Ta'afi? ",
+                 style: AppTextStyles.bodyLarge.copyWith(
+                   color: AppColors.textColor,
                   ),
+                 ),
 
-                  Text(
-                    "Create an Account",
-
-                    style:
-                        AppTextStyles.bodyLarge
-                            .copyWith(
-                      color:
-                          const Color(0xff934800),
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
-                  ),
-                ],
+                GestureDetector(
+                 onTap: () {
+                 Navigator.push(
+                 context,
+                MaterialPageRoute(
+                 builder: (_) => const SignUp(),
+               ),
+              );
+            },
+               child: Text(
+                "Create an Account",
+               style: AppTextStyles.bodyLarge.copyWith(
+                color: const Color(0xff934800),
+                 fontWeight: FontWeight.bold,
+                ),
+               ),
               ),
+             ],
+            ),
 
               const SizedBox(height: 40),
             ],
