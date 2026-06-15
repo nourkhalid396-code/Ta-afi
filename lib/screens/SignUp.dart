@@ -1,9 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/HomeDashboard.dart';
+import 'package:my_app/screens/login.dart';
 
-class SignUp extends StatelessWidget {
+class SignUp extends StatefulWidget {
   const SignUp({super.key});
+  @override
+  State<SignUp> createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
+  String _errorMessage = '';
+
+  Future<void> _signUp() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() => _errorMessage = 'Passwords do not match');
+      return;
+    }
+    if (_nameController.text.trim().isEmpty) {
+      setState(() => _errorMessage = 'Please enter your name');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      UserCredential cred =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(cred.user!.uid)
+          .set({
+        'fullName': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'phone': '',
+        'streak': 0,
+        'lastActive': FieldValue.serverTimestamp(),
+        'settings': {
+          'language': 'en',
+          'notifications': true,
+          'theme': 'light',
+        },
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeDashboard()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        switch (e.code) {
+          case 'email-already-in-use':
+            _errorMessage = 'Email already in use';
+            break;
+          case 'invalid-email':
+            _errorMessage = 'Invalid email';
+            break;
+          case 'weak-password':
+            _errorMessage = 'Password too weak (min 6 characters)';
+            break;
+          default:
+            _errorMessage = 'Sign up failed, try again';
+        }
+      });
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +140,6 @@ class SignUp extends StatelessWidget {
                   ],
                 ),
               ),
-
               Transform.translate(
                 offset: const Offset(0, -20),
                 child: Container(
@@ -65,9 +153,7 @@ class SignUp extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 28,
-                    ),
+                        horizontal: 32, vertical: 28),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -79,9 +165,7 @@ class SignUp extends StatelessWidget {
                             color: const Color(0xff1A1C1C),
                           ),
                         ),
-
                         const SizedBox(height: 10),
-
                         Text(
                           "Start your healing journey today.",
                           style: AppTextStyles.bodyMedium.copyWith(
@@ -89,49 +173,41 @@ class SignUp extends StatelessWidget {
                             fontSize: 16,
                           ),
                         ),
-
                         const SizedBox(height: 38),
-
                         buildTextField(
+                          controller: _nameController,
                           icon: Icons.person_outline,
                           hint: "Full Name",
                         ),
-
                         const SizedBox(height: 24),
-
                         buildTextField(
+                          controller: _emailController,
                           icon: Icons.email_outlined,
                           hint: "Email Address",
                         ),
-
                         const SizedBox(height: 24),
-
                         buildTextField(
+                          controller: _passwordController,
                           icon: Icons.lock_outline,
                           hint: "Create Password",
                           obscure: true,
                         ),
-
                         const SizedBox(height: 24),
-
                         buildTextField(
+                          controller: _confirmPasswordController,
                           icon: Icons.lock_outline,
                           hint: "Confirm Password",
                           obscure: true,
                         ),
-
-                        const SizedBox(height: 80),
-
+                        if (_errorMessage.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text(_errorMessage,
+                              style: const TextStyle(
+                                  color: Colors.red, fontSize: 14)),
+                        ],
+                        const SizedBox(height: 40),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const HomeDashboard(),
-                              ),
-                            );
-                          },
+                          onTap: _isLoading ? null : _signUp,
                           child: Container(
                             width: double.infinity,
                             height: 64,
@@ -144,8 +220,7 @@ class SignUp extends StatelessWidget {
                                   Color(0xFFB85C00),
                                 ],
                               ),
-                              borderRadius:
-                                  BorderRadius.circular(22),
+                              borderRadius: BorderRadius.circular(22),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.08),
@@ -155,20 +230,20 @@ class SignUp extends StatelessWidget {
                               ],
                             ),
                             child: Center(
-                              child: Text(
-                                "SIGN UP",
-                                style:
-                                    AppTextStyles.buttonText.copyWith(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : Text(
+                                      "SIGN UP",
+                                      style: AppTextStyles.buttonText.copyWith(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 46),
-
                         Center(
                           child: RichText(
                             textAlign: TextAlign.center,
@@ -179,49 +254,39 @@ class SignUp extends StatelessWidget {
                               ),
                               children: const [
                                 TextSpan(
-                                  text:
-                                      "By signing up, you agree to our ",
-                                ),
+                                    text: "By signing up, you agree to our "),
                                 TextSpan(
                                   text: "Terms",
-                                  style: TextStyle(
-                                    color: Color(0xff005FAF),
-                                  ),
+                                  style: TextStyle(color: Color(0xff005FAF)),
                                 ),
                                 TextSpan(text: " and\n"),
                                 TextSpan(
                                   text: "Privacy Policy.",
-                                  style: TextStyle(
-                                    color: Color(0xff005FAF),
-                                  ),
+                                  style: TextStyle(color: Color(0xff005FAF)),
                                 ),
                               ],
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 36),
-
                         Center(
                           child: GestureDetector(
                             onTap: () {
                               Navigator.pushReplacement(
-                               context, 
-                               MaterialPageRoute(
-                                builder: (context) => const HomeDashboard(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          "Already have an account? Log in.",
-                           style: AppTextStyles.bodyLarge.copyWith(
-                            color: const Color(0xff005FAF),
-                              fontWeight: FontWeight.bold,
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const Login()),
+                              );
+                            },
+                            child: Text(
+                              "Already have an account? Log in.",
+                              style: AppTextStyles.bodyLarge.copyWith(
+                                color: const Color(0xff005FAF),
+                                fontWeight: FontWeight.bold,
                               ),
-                             ),
-                           ),
-                         ),
-                         
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -236,6 +301,7 @@ class SignUp extends StatelessWidget {
   }
 
   Widget buildTextField({
+    required TextEditingController controller,
     required IconData icon,
     required String hint,
     bool obscure = false,
@@ -247,21 +313,17 @@ class SignUp extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: TextField(
+        controller: controller,
         obscureText: obscure,
         decoration: InputDecoration(
           border: InputBorder.none,
-          prefixIcon: Icon(
-            icon,
-            color: const Color(0xff7C8393),
-          ),
+          prefixIcon: Icon(icon, color: const Color(0xff7C8393)),
           hintText: hint,
           hintStyle: const TextStyle(
             color: Color(0xff7C8393),
             fontSize: 16,
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18,
-          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18),
         ),
       ),
     );
