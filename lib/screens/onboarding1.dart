@@ -10,12 +10,11 @@ class Onboarding1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.centerLeft,
+            begin: Alignment.topLeft,
+            end: Alignment.centerRight,
             colors: [
               Color(0xffFFE9DB),
               Colors.white,
@@ -24,89 +23,67 @@ class Onboarding1 extends StatelessWidget {
             stops: [0.0, 0.35, 1.0],
           ),
         ),
-
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 26),
-
+              padding: const EdgeInsets.symmetric(horizontal: 26),
               child: Column(
                 children: [
-
                   const SizedBox(height: 18),
-
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       Text(
-                        "Ta'afi",
-                        style:
-                            AppTextStyles.headlineMedium
-                                .copyWith(
+                        "تعافي",
+                        style: AppTextStyles.headlineMedium.copyWith(
                           color: const Color(0xff934800),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
-                     GestureDetector(
-                      onTap: () {
-                     Navigator.pushReplacement(
-                       context,
-                     MaterialPageRoute(
-                      builder: (context) => const Login(),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Login(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "تخطي",
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                     );
-                    },
-                     child: Text(
-                      "Skip",
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textColor,
-                     fontWeight: FontWeight.w600,
-                    ),
-                   ),
-                  ),
                     ],
                   ),
-
                   const SizedBox(height: 30),
-
                   Stack(
                     alignment: Alignment.center,
-
                     children: [
-
                       Container(
                         width: 330,
                         height: 330,
-
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Color(0xffF2F2F2),
                         ),
                       ),
-
                       Positioned(
-                        right: -5,
+                        left: -5,
                         top: 70,
-
                         child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(12),
-
+                          borderRadius: BorderRadius.circular(12),
                           child: Image.asset(
                             'assets/images/AB6AXuB8uQsExbpNn8GmR9tL3guxtwyshOcKINzFbmaP2294miT4yAN12n0ym47X0DXlhMzMXltoW6MFX0ZunKrSnl41xYsKcmtFbppG1i3aCZ_DJngPeShH5OWuFRMP5YpNoK7BvkNKrZl7cxNHW3zGy3l_1JThP3t_uv3wcOchVQhLCFVU7eYx9IXDv0G7yyFPVc3tb302mnZJQaw30O.png',
-
                             width: 120,
                             height: 190,
                             fit: BoxFit.cover,
                           ),
                         ),
                       ),
-
                       Image.asset(
                         'assets/images/The Phone Frame.png',
                         width: 260,
@@ -115,116 +92,76 @@ class Onboarding1 extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 45),
-
                   Text(
-                    "Hand Recovery",
-
-                    style: AppTextStyles.headlineLarge
-                        .copyWith(
+                    "إعادة تأهيل اليد",
+                    style: AppTextStyles.headlineLarge.copyWith(
                       fontWeight: FontWeight.bold,
                       color: const Color(0xff1A1C1C),
                     ),
                   ),
-
                   const SizedBox(height: 18),
-
                   Text(
-                    "Ta'afi uses advanced camera\ntracking to guide your physical\nexercises with real-time precision.",
-
+                    "تعافي تستخدم تقنية تتبع\nالكاميرا المتقدمة لإرشادك في\nتمارينك الجسدية بدقة فورية.",
                     textAlign: TextAlign.center,
-
-                    style:
-                        AppTextStyles.bodyLarge.copyWith(
+                    style: AppTextStyles.bodyLarge.copyWith(
                       height: 1.8,
                       color: const Color(0xff414752),
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       indicator(true),
-
                       const SizedBox(width: 8),
-
                       indicator(false),
-
                       const SizedBox(width: 8),
-
                       indicator(false),
                     ],
                   ),
-
                   const SizedBox(height: 35),
-
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const Onboarding2(),
+                          builder: (context) => const Onboarding2(),
                         ),
                       );
                     },
-
                     child: Container(
                       width: double.infinity,
                       height: 68,
-
                       decoration: BoxDecoration(
                         color: const Color(0xffB85C00),
-
-                        borderRadius:
-                            BorderRadius.circular(22),
+                        borderRadius: BorderRadius.circular(22),
                       ),
-
                       child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
-
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-
                           Text(
-                            "Next",
-
-                            style: AppTextStyles
-                                .buttonText
-                                .copyWith(
+                            "التالي",
+                            style: AppTextStyles.buttonText.copyWith(
                               fontSize: 20,
                             ),
                           ),
-
                           const SizedBox(width: 10),
-
                           const Icon(
-                            Icons.arrow_forward,
+                            Icons.arrow_back,
                             color: Colors.white,
                           ),
                         ],
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 30),
-
                   Text(
-                    "Step 1 of 3: Technical Foundation",
-
-                    style:
-                        AppTextStyles.bodyMedium.copyWith(
+                    "الخطوة 1 من 3: الأساس التقني",
+                    style: AppTextStyles.bodyMedium.copyWith(
                       color: const Color(0xff7A808A),
                     ),
                   ),
-
                   const SizedBox(height: 25),
                 ],
               ),
@@ -239,12 +176,8 @@ class Onboarding1 extends StatelessWidget {
     return Container(
       width: active ? 24 : 8,
       height: 8,
-
       decoration: BoxDecoration(
-        color: active
-            ? const Color(0xffB85C00)
-            : Colors.grey.shade300,
-
+        color: active ? const Color(0xffB85C00) : Colors.grey.shade300,
         borderRadius: BorderRadius.circular(20),
       ),
     );

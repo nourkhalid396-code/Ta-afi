@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_app/screens/DailyGoalStatus.dart';
 import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/HomeDashboard.dart';
 import 'package:my_app/screens/PhysicalRehabExercises.dart';
 import 'package:my_app/screens/Progress&Achievements.dart';
 import 'package:my_app/screens/ProfileScreen.dart';
-import 'package:my_app/screens/ExerciseReminder.dart';
 
 class CognitiveGame extends StatefulWidget {
   const CognitiveGame({super.key});
@@ -19,11 +17,12 @@ class CognitiveGame extends StatefulWidget {
 class _CognitiveGameState extends State<CognitiveGame> {
   int _score = 0;
   int _matches = 0;
-  int _totalPairs = 3;
+  final int _totalPairs = 6; // ✅ زدنا من 3 لـ 6
   bool _gameStarted = false;
   DateTime? _startTime;
   int? _firstCardIndex;
 
+  // ✅ 6 أزواج مختلفة
   final List<Map<String, dynamic>> _cards = [
     {
       'id': 1,
@@ -41,20 +40,13 @@ class _CognitiveGameState extends State<CognitiveGame> {
     },
     {
       'id': 2,
-      'icon': Icons.sports_baseball,
+      'icon': Icons.favorite,
       'color': const Color(0xFFB85C00),
       'matched': false,
       'flipped': false
     },
     {
       'id': 2,
-      'icon': Icons.sports_baseball,
-      'color': const Color(0xFFB85C00),
-      'matched': false,
-      'flipped': false
-    },
-    {
-      'id': 3,
       'icon': Icons.favorite,
       'color': const Color(0xFFB85C00),
       'matched': false,
@@ -62,12 +54,67 @@ class _CognitiveGameState extends State<CognitiveGame> {
     },
     {
       'id': 3,
-      'icon': Icons.favorite,
+      'icon': Icons.star,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 3,
+      'icon': Icons.star,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 4,
+      'icon': Icons.sports_basketball,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 4,
+      'icon': Icons.sports_basketball,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 5,
+      'icon': Icons.music_note,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 5,
+      'icon': Icons.music_note,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 6,
+      'icon': Icons.bolt,
+      'color': const Color(0xFFB85C00),
+      'matched': false,
+      'flipped': false
+    },
+    {
+      'id': 6,
+      'icon': Icons.bolt,
       'color': const Color(0xFFB85C00),
       'matched': false,
       'flipped': false
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _cards.shuffle(); // ✅ خلط البطاقات عشوائياً
+  }
 
   Future<void> _saveGameResult() async {
     try {
@@ -84,6 +131,7 @@ class _CognitiveGameState extends State<CognitiveGame> {
         'repsCompleted': _matches,
         'accuracyScore': (_matches / _totalPairs * 100).round(),
         'type': 'cognitive',
+        'status': 'completed', // ✅ سطر جديد
       });
     } catch (e) {
       print('Error saving game: $e');
@@ -115,9 +163,43 @@ class _CognitiveGameState extends State<CognitiveGame> {
         if (_matches == _totalPairs) {
           _saveGameResult();
           Future.delayed(const Duration(milliseconds: 500), () {
-            if (mounted)
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const DailyGoalStatus()));
+            if (mounted) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  title: const Text(
+                    '🎉 أحسنت!',
+                    textAlign: TextAlign.center,
+                  ),
+                  content: Text(
+                    'أكملتِ لعبة الذاكرة!\nالنتيجة: $_score',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const HomeDashboard()),
+                        (route) => false,
+                      ),
+                      child: const Text(
+                        'العودة للرئيسية',
+                        style: TextStyle(
+                          color: Color(0xFF934800),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
           });
         }
       } else {
@@ -132,9 +214,9 @@ class _CognitiveGameState extends State<CognitiveGame> {
   }
 
   String get _timeRemaining {
-    if (_startTime == null) return "2:00";
+    if (_startTime == null) return "3:00"; // ✅ زدنا الوقت لـ 3 دقايق
     int elapsed = DateTime.now().difference(_startTime!).inSeconds;
-    int remaining = 120 - elapsed;
+    int remaining = 180 - elapsed;
     if (remaining < 0) remaining = 0;
     return "${remaining ~/ 60}:${(remaining % 60).toString().padLeft(2, '0')}";
   }
@@ -164,19 +246,11 @@ class _CognitiveGameState extends State<CognitiveGame> {
                               AssetImage('assets/images/Avatar5.png')),
                     ),
                     const SizedBox(width: 10),
-                    Text("Ta'afi",
+                    Text("تعافي",
                         style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.primaryColor,
                             fontWeight: FontWeight.bold)),
                     const Spacer(),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const ExerciseReminder())),
-                      child: const Icon(Icons.notifications_none,
-                          color: Color(0xff64748B)),
-                    ),
                   ],
                 ),
               ),
@@ -189,36 +263,38 @@ class _CognitiveGameState extends State<CognitiveGame> {
                       children: [
                         Expanded(
                             child: topCard(
-                                title: "SCORE",
+                                title: "النتيجة",
                                 value: "$_score",
                                 titleColor: const Color(0xff005FAF))),
                         const SizedBox(width: 10),
                         Expanded(
                             child: topCard(
-                                title: "TIME\nREMAINING",
+                                title: "الوقت\nالمتبقي",
                                 value: _timeRemaining,
                                 titleColor: const Color(0xff934800))),
                       ],
                     ),
                     const SizedBox(height: 22),
-                    Text("Memory Match",
+                    Text("لعبة الذاكرة",
                         style: AppTextStyles.headlineMedium.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 30,
                             color: const Color(0xff1A1C1C))),
                     const SizedBox(height: 8),
-                    Text("Find the matching pairs to strengthen focus.",
+                    Text("اعثري على الأزواج المتطابقة لتقوية التركيز.",
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium
                             .copyWith(color: const Color(0xff414752))),
                     const SizedBox(height: 22),
+
+                    // ✅ Grid بـ 3 أعمدة
                     GridView.count(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 14,
-                      crossAxisSpacing: 14,
-                      childAspectRatio: 0.78,
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.85,
                       children: List.generate(_cards.length, (index) {
                         return GestureDetector(
                           onTap: () => _onCardTap(index),
@@ -232,6 +308,7 @@ class _CognitiveGameState extends State<CognitiveGame> {
                         );
                       }),
                     ),
+
                     const SizedBox(height: 18),
                     Container(
                       width: double.infinity,
@@ -254,13 +331,17 @@ class _CognitiveGameState extends State<CognitiveGame> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Cognitive Focus",
+                                Text("التركيز الإدراكي",
                                     style: AppTextStyles.bodyLarge.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: const Color(0xff1A1C1C))),
                                 const SizedBox(height: 4),
                                 Text(
-                                    "You're currently matching at ${_matches > 0 ? (_matches / _totalPairs * 100).round() : 0}%\naccuracy. Well done!",
+                                    _matches == 0
+                                        ? "اقلبي البطاقات لإيجاد الأزواج المتطابقة!"
+                                        : _matches == _totalPairs
+                                            ? "ممتاز! طابقتِ كل الأزواج! 🎉"
+                                            : "نسبة تطابقك ${(_matches / _totalPairs * 100).round()}% — واصلي!",
                                     style: AppTextStyles.bodyMedium.copyWith(
                                         color: const Color(0xff414752),
                                         height: 1.5)),
@@ -289,7 +370,7 @@ class _CognitiveGameState extends State<CognitiveGame> {
                   MaterialPageRoute(builder: (_) => const HomeDashboard()),
                   (route) => false),
               child: navItem(
-                  icon: Icons.home_outlined, title: "Home", active: false)),
+                  icon: Icons.home_outlined, title: "الرئيسية", active: false)),
           GestureDetector(
               onTap: () => Navigator.push(
                   context,
@@ -297,19 +378,19 @@ class _CognitiveGameState extends State<CognitiveGame> {
                       builder: (_) => const PhysicalRehabExercises())),
               child: navItem(
                   icon: Icons.back_hand_outlined,
-                  title: "Exercises",
+                  title: "التمارين",
                   active: false)),
           GestureDetector(
               onTap: () {},
               child: navItem(
-                  icon: Icons.psychology, title: "Games", active: true)),
+                  icon: Icons.psychology, title: "الألعاب", active: true)),
           GestureDetector(
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (_) => const ProgressAchievements())),
               child: navItem(
-                  icon: Icons.auto_graph, title: "Progress", active: false)),
+                  icon: Icons.auto_graph, title: "التقدم", active: false)),
         ]),
       ),
     );
@@ -353,20 +434,27 @@ class _CognitiveGameState extends State<CognitiveGame> {
                 ? Colors.green.shade100
                 : (customColor ?? AppColors.primaryColor))
             : Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(16),
         border: opened ? null : Border.all(color: Colors.grey.shade400),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Center(
         child: opened
             ? (icon != null
                 ? Icon(icon,
-                    color: matched ? Colors.green : Colors.white, size: 42)
-                : const Text("?",
+                    color: matched ? Colors.green : Colors.white, size: 36)
+                : const Text("؟",
                     style: TextStyle(
                         color: Colors.blue,
                         fontSize: 22,
                         fontWeight: FontWeight.bold)))
-            : const Text("?",
+            : const Text("؟",
                 style: TextStyle(
                     color: Colors.blue,
                     fontSize: 22,

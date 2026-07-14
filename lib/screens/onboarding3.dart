@@ -9,7 +9,6 @@ class Onboarding3 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8FAFC),
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -17,19 +16,14 @@ class Onboarding3 extends StatelessWidget {
               horizontal: 20,
               vertical: 10,
             ),
-
             child: Column(
               children: [
-
                 const SizedBox(height: 35),
-
                 Container(
                   padding: const EdgeInsets.all(10),
-
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
-
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.04),
@@ -38,10 +32,8 @@ class Onboarding3 extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-
                     child: Image.asset(
                       'assets/images/progress.png',
                       width: 290,
@@ -50,53 +42,38 @@ class Onboarding3 extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 Text(
-                  "Share Your Progress",
+                  "شارك تقدمك",
                   textAlign: TextAlign.center,
-
                   style: AppTextStyles.headlineLarge.copyWith(
                     color: const Color(0xff1A1C1C),
                   ),
                 ),
-
                 const SizedBox(height: 18),
-
                 Text(
-                  "Empower your recovery by tracking\n"
-                  "daily improvements and securely\n"
-                  "sharing results with your healthcare\n"
-                  "provider for better insights.",
-
+                  "عزّز رحلة تعافيك من خلال تتبع\n"
+                  "التحسّن اليومي ومشاركة النتائج\n"
+                  "بأمان مع مقدّم الرعاية الصحية\n"
+                  "للحصول على رؤى أفضل.",
                   textAlign: TextAlign.center,
-
                   style: AppTextStyles.bodyLarge.copyWith(
                     height: 1.9,
                     color: const Color(0xff414752),
                   ),
                 ),
-
                 const SizedBox(height: 34),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     indicator(false),
-
                     const SizedBox(width: 8),
-
                     indicator(false),
-
                     const SizedBox(width: 8),
-
                     indicator(true),
                   ],
                 ),
-
                 const SizedBox(height: 20),
-
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -106,14 +83,11 @@ class Onboarding3 extends StatelessWidget {
                       ),
                     );
                   },
-
                   child: Container(
                     width: double.infinity,
                     height: 66,
-
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(22),
-
                       gradient: const LinearGradient(
                         begin: Alignment.centerRight,
                         end: Alignment.centerLeft,
@@ -122,7 +96,6 @@ class Onboarding3 extends StatelessWidget {
                           Color(0xff934800),
                         ],
                       ),
-
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.15),
@@ -131,39 +104,28 @@ class Onboarding3 extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
-
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-
                         Text(
-                          "Get Started",
-
-                          style: AppTextStyles.buttonText
-                              .copyWith(
+                          "ابدأ الآن",
+                          style: AppTextStyles.buttonText.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(width: 10),
-
                         const Icon(
-                          Icons.arrow_forward,
+                          Icons.arrow_back,
                           color: Colors.white,
                         ),
                       ],
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 Text(
-                  "STEP 3 OF 3",
-
+                  "الخطوة 3 من 3",
                   style: AppTextStyles.bodyMedium.copyWith(
                     letterSpacing: 3,
                     color: const Color(0xff7A808A),
@@ -181,12 +143,8 @@ class Onboarding3 extends StatelessWidget {
     return Container(
       width: active ? 32 : 8,
       height: 8,
-
       decoration: BoxDecoration(
-        color: active
-            ? const Color(0xffB85C00)
-            : Colors.grey.shade300,
-
+        color: active ? const Color(0xffB85C00) : Colors.grey.shade300,
         borderRadius: BorderRadius.circular(20),
       ),
     );

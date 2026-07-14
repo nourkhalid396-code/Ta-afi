@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_app/screens/Homedashboard.dart';
+import 'package:my_app/screens/AdminDashboard.dart';
 import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/ForgetScreen.dart';
 import 'package:my_app/screens/SignUp.dart';
@@ -29,30 +30,50 @@ class _LoginState extends State<Login> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      final uid = cred.user!.uid;
+
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(cred.user!.uid)
+          .doc(uid)
           .update({'lastActive': FieldValue.serverTimestamp()});
+
+      // ✅ نقرأ الـ role ونحدد وين نوجه المستخدمة
+      final userDoc =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+      final role = userDoc.data()?['role'] ?? 'patient';
+
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeDashboard()),
-        );
+        if (role == 'admin') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboard()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const HomeDashboard()),
+          );
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
         switch (e.code) {
           case 'user-not-found':
-            _errorMessage = 'User not found';
+            _errorMessage = 'المستخدم غير موجود';
             break;
           case 'wrong-password':
-            _errorMessage = 'Wrong password';
+            _errorMessage = 'كلمة المرور غير صحيحة';
+            break;
+          case 'invalid-credential':
+            _errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
             break;
           case 'invalid-email':
-            _errorMessage = 'Invalid email';
+            _errorMessage = 'البريد الإلكتروني غير صالح';
             break;
           default:
-            _errorMessage = 'Login failed, try again';
+            _errorMessage = 'فشل تسجيل الدخول، حاول مرة أخرى';
         }
       });
     } finally {
@@ -86,7 +107,7 @@ class _LoginState extends State<Login> {
                 ),
                 child: Center(
                   child: Text(
-                    "Ta'afi",
+                    "تعافي",
                     style: AppTextStyles.headlineMedium.copyWith(
                       color: const Color(0xffEA580C),
                       fontWeight: FontWeight.bold,
@@ -105,7 +126,7 @@ class _LoginState extends State<Login> {
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: "Welcome to your\n",
+                            text: "أهلاً بك في\n",
                             style: AppTextStyles.headlineLarge.copyWith(
                               fontSize: 42,
                               fontWeight: FontWeight.w800,
@@ -114,7 +135,7 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                           TextSpan(
-                            text: "Sanctuary",
+                            text: "ملاذك الآمن",
                             style: AppTextStyles.headlineLarge.copyWith(
                               fontSize: 42,
                               fontWeight: FontWeight.w800,
@@ -126,7 +147,7 @@ class _LoginState extends State<Login> {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      "A restorative space for your\nrehabilitation journey. Let's continue\nwhere you left off.",
+                      "مساحة للراحة والتعافي في رحلة\nإعادة تأهيلك. لنكمل من حيث\nتوقفت.",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodyLarge.copyWith(
                         color: const Color(0xff5A5F6A),
@@ -155,7 +176,7 @@ class _LoginState extends State<Login> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Email Address",
+                    Text("البريد الإلكتروني",
                         style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w500, fontSize: 16)),
                     const SizedBox(height: 12),
@@ -168,6 +189,7 @@ class _LoginState extends State<Login> {
                       child: TextField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
+                        textDirection: TextDirection.ltr,
                         decoration: InputDecoration(
                           hintText: "name@example.com",
                           hintStyle: AppTextStyles.bodyLarge
@@ -181,7 +203,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     const SizedBox(height: 28),
-                    Text("Password",
+                    Text("كلمة المرور",
                         style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w500, fontSize: 16)),
                     const SizedBox(height: 12),
@@ -194,6 +216,7 @@ class _LoginState extends State<Login> {
                       child: TextField(
                         controller: _passwordController,
                         obscureText: true,
+                        textDirection: TextDirection.ltr,
                         decoration: InputDecoration(
                           hintText: "••••••••",
                           hintStyle: AppTextStyles.bodyLarge.copyWith(
@@ -208,7 +231,7 @@ class _LoginState extends State<Login> {
                     ),
                     const SizedBox(height: 14),
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: Alignment.centerLeft,
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -218,7 +241,7 @@ class _LoginState extends State<Login> {
                           );
                         },
                         child: Text(
-                          "Forgot Password?",
+                          "نسيت كلمة المرور؟",
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: const Color(0xff005FAF),
                             fontWeight: FontWeight.w600,
@@ -258,7 +281,7 @@ class _LoginState extends State<Login> {
                               ? const CircularProgressIndicator(
                                   color: Colors.white)
                               : Text(
-                                  "LOG IN",
+                                  "تسجيل الدخول",
                                   style: AppTextStyles.buttonText.copyWith(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -275,7 +298,7 @@ class _LoginState extends State<Login> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("New to Ta'afi? ",
+                  Text("جديد على تعافي؟ ",
                       style: AppTextStyles.bodyLarge
                           .copyWith(color: AppColors.textColor)),
                   GestureDetector(
@@ -286,7 +309,7 @@ class _LoginState extends State<Login> {
                       );
                     },
                     child: Text(
-                      "Create an Account",
+                      "إنشاء حساب",
                       style: AppTextStyles.bodyLarge.copyWith(
                         color: const Color(0xff934800),
                         fontWeight: FontWeight.bold,

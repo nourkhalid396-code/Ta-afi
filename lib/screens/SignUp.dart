@@ -21,11 +21,11 @@ class _SignUpState extends State<SignUp> {
 
   Future<void> _signUp() async {
     if (_passwordController.text != _confirmPasswordController.text) {
-      setState(() => _errorMessage = 'Passwords do not match');
+      setState(() => _errorMessage = 'كلمتا المرور غير متطابقتين');
       return;
     }
     if (_nameController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Please enter your name');
+      setState(() => _errorMessage = 'الرجاء إدخال اسمك');
       return;
     }
 
@@ -51,7 +51,7 @@ class _SignUpState extends State<SignUp> {
         'streak': 0,
         'lastActive': FieldValue.serverTimestamp(),
         'settings': {
-          'language': 'en',
+          'language': 'ar',
           'notifications': true,
           'theme': 'light',
         },
@@ -68,16 +68,16 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         switch (e.code) {
           case 'email-already-in-use':
-            _errorMessage = 'Email already in use';
+            _errorMessage = 'البريد الإلكتروني مستخدم من قبل';
             break;
           case 'invalid-email':
-            _errorMessage = 'Invalid email';
+            _errorMessage = 'البريد الإلكتروني غير صالح';
             break;
           case 'weak-password':
-            _errorMessage = 'Password too weak (min 6 characters)';
+            _errorMessage = 'كلمة المرور ضعيفة (6 أحرف على الأقل)';
             break;
           default:
-            _errorMessage = 'Sign up failed, try again';
+            _errorMessage = 'فشل إنشاء الحساب، حاول مرة أخرى';
         }
       });
     } finally {
@@ -130,7 +130,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                     const SizedBox(height: 18),
                     Text(
-                      "Ta'afi",
+                      "تعافي",
                       style: AppTextStyles.headlineMedium.copyWith(
                         color: Colors.white,
                         fontSize: 28,
@@ -158,7 +158,7 @@ class _SignUpState extends State<SignUp> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Create Your Account",
+                          "أنشئ حسابك",
                           style: AppTextStyles.headlineMedium.copyWith(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -167,7 +167,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          "Start your healing journey today.",
+                          "ابدأ رحلة تعافيك اليوم.",
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: const Color(0xff6B7280),
                             fontSize: 16,
@@ -177,27 +177,30 @@ class _SignUpState extends State<SignUp> {
                         buildTextField(
                           controller: _nameController,
                           icon: Icons.person_outline,
-                          hint: "Full Name",
+                          hint: "الاسم الكامل",
                         ),
                         const SizedBox(height: 24),
                         buildTextField(
                           controller: _emailController,
                           icon: Icons.email_outlined,
-                          hint: "Email Address",
+                          hint: "البريد الإلكتروني",
+                          isLtr: true,
                         ),
                         const SizedBox(height: 24),
                         buildTextField(
                           controller: _passwordController,
                           icon: Icons.lock_outline,
-                          hint: "Create Password",
+                          hint: "أنشئ كلمة مرور",
                           obscure: true,
+                          isLtr: true,
                         ),
                         const SizedBox(height: 24),
                         buildTextField(
                           controller: _confirmPasswordController,
                           icon: Icons.lock_outline,
-                          hint: "Confirm Password",
+                          hint: "تأكيد كلمة المرور",
                           obscure: true,
+                          isLtr: true,
                         ),
                         if (_errorMessage.isNotEmpty) ...[
                           const SizedBox(height: 12),
@@ -213,8 +216,8 @@ class _SignUpState extends State<SignUp> {
                             height: 64,
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
+                                begin: Alignment.centerRight,
+                                end: Alignment.centerLeft,
                                 colors: [
                                   Color(0xFF934800),
                                   Color(0xFFB85C00),
@@ -234,7 +237,7 @@ class _SignUpState extends State<SignUp> {
                                   ? const CircularProgressIndicator(
                                       color: Colors.white)
                                   : Text(
-                                      "SIGN UP",
+                                      "إنشاء حساب",
                                       style: AppTextStyles.buttonText.copyWith(
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
@@ -254,14 +257,14 @@ class _SignUpState extends State<SignUp> {
                               ),
                               children: const [
                                 TextSpan(
-                                    text: "By signing up, you agree to our "),
+                                    text: "بإنشائك للحساب، فأنت توافق على "),
                                 TextSpan(
-                                  text: "Terms",
+                                  text: "الشروط",
                                   style: TextStyle(color: Color(0xff005FAF)),
                                 ),
-                                TextSpan(text: " and\n"),
+                                TextSpan(text: " و\n"),
                                 TextSpan(
-                                  text: "Privacy Policy.",
+                                  text: "سياسة الخصوصية.",
                                   style: TextStyle(color: Color(0xff005FAF)),
                                 ),
                               ],
@@ -279,7 +282,7 @@ class _SignUpState extends State<SignUp> {
                               );
                             },
                             child: Text(
-                              "Already have an account? Log in.",
+                              "لديك حساب بالفعل؟ سجّل الدخول.",
                               style: AppTextStyles.bodyLarge.copyWith(
                                 color: const Color(0xff005FAF),
                                 fontWeight: FontWeight.bold,
@@ -305,6 +308,7 @@ class _SignUpState extends State<SignUp> {
     required IconData icon,
     required String hint,
     bool obscure = false,
+    bool isLtr = false,
   }) {
     return Container(
       height: 56,
@@ -315,6 +319,7 @@ class _SignUpState extends State<SignUp> {
       child: TextField(
         controller: controller,
         obscureText: obscure,
+        textDirection: isLtr ? TextDirection.ltr : TextDirection.rtl,
         decoration: InputDecoration(
           border: InputBorder.none,
           prefixIcon: Icon(icon, color: const Color(0xff7C8393)),

@@ -1,28 +1,114 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_app/screens/OfflineSaveScreen.dart';
 import 'package:my_app/theme/app_theme.dart';
-import 'package:my_app/screens/ProfileScreen.dart';
-import 'package:my_app/screens/ExerciseReminder.dart';
 
 class MemoryGames extends StatefulWidget {
   const MemoryGames({super.key});
-
   @override
   State<MemoryGames> createState() => _MemoryGamesState();
 }
 
 class _MemoryGamesState extends State<MemoryGames> {
-  int _score = 240;
-  int _timerSeconds = 105;
-  int _completedSessions = 3;
-  int _totalGoal = 5;
+  int _score = 0;
+  int _timerSeconds = 120;
+  int _completedSessions = 0;
+  final int _totalGoal = 5;
+  Timer? _timer;
+  bool _gameOver = false;
+
+  // بيانات البطاقات
+  final List<IconData> _icons = [
+    Icons.psychology_alt_outlined,
+    Icons.psychology_alt_outlined,
+    Icons.healing_outlined,
+    Icons.healing_outlined,
+    Icons.favorite,
+    Icons.favorite,
+    Icons.star,
+    Icons.star,
+    Icons.back_hand_outlined,
+    Icons.back_hand_outlined,
+    Icons.fitness_center,
+    Icons.fitness_center,
+  ];
+
+  late List<IconData> _shuffledIcons;
+  final List<bool> _flipped = List.filled(12, false);
+  final List<bool> _matched = List.filled(12, false);
+  int? _firstFlipped;
+  bool _waiting = false;
 
   @override
   void initState() {
     super.initState();
+    _shuffledIcons = List.from(_icons)..shuffle();
+    _startTimer();
     _loadUserData();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_timerSeconds > 0) {
+        setState(() => _timerSeconds--);
+      } else {
+        _timer?.cancel();
+        setState(() => _gameOver = true);
+        _showGameOver();
+      }
+    });
+  }
+
+  void _onCardTap(int index) {
+    if (_waiting || _flipped[index] || _matched[index] || _gameOver) return;
+
+    setState(() => _flipped[index] = true);
+
+    if (_firstFlipped == null) {
+      _firstFlipped = index;
+    } else {
+      if (_shuffledIcons[_firstFlipped!] == _shuffledIcons[index]) {
+        setState(() {
+          _matched[_firstFlipped!] = true;
+          _matched[index] = true;
+          _score += 20;
+        });
+        _firstFlipped = null;
+        if (_matched.every((m) => m)) _saveSession();
+      } else {
+        _waiting = true;
+        Future.delayed(const Duration(milliseconds: 800), () {
+          setState(() {
+            _flipped[_firstFlipped!] = false;
+            _flipped[index] = false;
+            _firstFlipped = null;
+            _waiting = false;
+          });
+        });
+      }
+    }
+  }
+
+  void _showGameOver() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        title: const Text('⏰ Time\'s Up!'),
+        content: Text('Your score: $_score'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _saveSession();
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _loadUserData() async {
@@ -40,6 +126,7 @@ class _MemoryGamesState extends State<MemoryGames> {
   }
 
   Future<void> _saveSession() async {
+    _timer?.cancel();
     try {
       String? uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
@@ -47,257 +134,165 @@ class _MemoryGamesState extends State<MemoryGames> {
         'userId': uid,
         'exerciseId': 'memory_match',
         'completedAt': FieldValue.serverTimestamp(),
-        'durationSeconds': 105 - _timerSeconds,
-        'repsCompleted': 6,
-        'accuracyScore': 85,
+        'durationSeconds': 120 - _timerSeconds,
+        'repsCompleted': _matched.where((m) => m).length ~/ 2,
+        'accuracyScore': _score,
         'type': 'memory',
       });
-      if (mounted)
-        Navigator.push(context,
+      if (mounted) {
+        Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (_) => const OfflineSaveScreen()));
+      }
     } catch (e) {
       print('Error: $e');
     }
   }
 
   @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF7F4F4),
+      backgroundColor: const Color(0xffEEF2FF),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: const BoxDecoration(color: Colors.white),
-                child: Row(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(children: [
-                      const Icon(Icons.timer_outlined,
-                          color: Color(0xffC2410C), size: 22),
-                      const SizedBox(width: 8),
-                      Text(
-                          "${_timerSeconds ~/ 60}:${(_timerSeconds % 60).toString().padLeft(2, '0')}",
-                          style: AppTextStyles.bodyLarge.copyWith(
-                              color: const Color(0xff64748B),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18)),
-                    ]),
-                    const Spacer(),
-                    Text("Taafi",
-                        style: AppTextStyles.headlineMedium.copyWith(
-                            color: const Color(0xffC2410C),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22)),
-                    const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 10),
+                          horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                          color: const Color(0xffF7EFE8),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Text("Score: $_score",
-                          style: AppTextStyles.bodyMedium.copyWith(
-                              color: const Color(0xffC2410C),
-                              fontWeight: FontWeight.bold)),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.timer_outlined,
+                            color: Color(0xffC2410C), size: 20),
+                        const SizedBox(width: 6),
+                        Text(
+                          "${_timerSeconds ~/ 60}:${(_timerSeconds % 60).toString().padLeft(2, '0')}",
+                          style: TextStyle(
+                            color: _timerSeconds < 30
+                                ? Colors.red
+                                : const Color(0xff64748B),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ]),
                     ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                child: Column(
-                  children: [
                     Text("Memory Match",
                         style: AppTextStyles.headlineMedium.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff1A1C1C),
-                            fontSize: 24)),
-                    const SizedBox(height: 10),
-                    Text(
-                        "Find the matching pairs to sharpen your\nfocus. Move gently and take your time.",
-                        textAlign: TextAlign.center,
-                        style: AppTextStyles.bodyMedium.copyWith(
-                            color: const Color(0xff6B7280),
-                            height: 1.7,
-                            fontSize: 15)),
-                    const SizedBox(height: 28),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.9,
-                      children: [
-                        GestureDetector(
-                            onTap: _saveSession,
-                            child: gameCard(
-                                borderColor: const Color(0xff934800),
-                                icon: Icons.psychology_alt_outlined,
-                                iconColor: const Color(0xff934800),
-                                whiteCard: true)),
-                        gameCard(),
-                        gameCard(),
-                        gameCard(
-                            borderColor: const Color(0xff2F8635),
-                            icon: Icons.healing_outlined,
-                            iconColor: const Color(0xff2F8635),
-                            whiteCard: true),
-                        gameCard(),
-                        gameCard(),
-                        gameCard(),
-                        gameCard(),
-                        gameCard(
-                            borderColor: const Color(0xff4D8DFF),
-                            icon: Icons.favorite,
-                            iconColor: const Color(0xff4D8DFF),
-                            whiteCard: true),
-                        gameCard(),
-                        gameCard(
-                            borderColor: const Color(0xffFF9D3D),
-                            icon: Icons.star,
-                            iconColor: const Color(0xffFF9D3D),
-                            whiteCard: true),
-                        gameCard(),
-                      ],
-                    ),
-                    const SizedBox(height: 28),
+                          color: const Color(0xffC2410C),
+                          fontWeight: FontWeight.bold,
+                        )),
                     Container(
-                      width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                          vertical: 28, horizontal: 24),
+                          horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                          color: const Color(0xffF1EEEE),
-                          borderRadius: BorderRadius.circular(28)),
-                      child: Column(
-                        children: [
-                          Container(
-                              width: 64,
-                              height: 64,
-                              decoration: const BoxDecoration(
-                                  color: Color(0xff9CF28E),
-                                  shape: BoxShape.circle),
-                              child: const Center(
-                                  child: Icon(Icons.verified,
-                                      color: Color(0xff0D6C1E), size: 30))),
-                          const SizedBox(height: 24),
-                          Text(
-                              "Daily Goal: $_completedSessions/$_totalGoal Sessions",
-                              style: AppTextStyles.headlineMedium.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xff1A1C1C),
-                                  fontSize: 18)),
-                          const SizedBox(height: 22),
-                          ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: LinearProgressIndicator(
-                                  value: _totalGoal > 0
-                                      ? (_completedSessions / _totalGoal)
-                                          .clamp(0.0, 1.0)
-                                      : 0.0,
-                                  minHeight: 8,
-                                  backgroundColor: const Color(0xffDDDDDD),
-                                  valueColor: const AlwaysStoppedAnimation(
-                                      Color(0xff0D6C1E)))),
-                        ],
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      child: Text("⭐ $_score",
+                          style: const TextStyle(
+                            color: Color(0xffC2410C),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          )),
                     ),
-                    const SizedBox(height: 34),
-                    Opacity(
-                      opacity: 0.9,
-                      child: Image.asset(
-                          'assets/images/AB6AXuAu9MOIboX7znQw8D5Fxv6X7vzbmiKxCtQjFhtn91RaTQQ9ZmLhV9uVPfHeG7mtLYxFmJmUgGTbfV-sACUZoo3bDUNj9-syARtnDNA_i5ZEWyVsber5bVYVNXWMIm4N6eG-hz8vFbTY6P5-0-qxvDxP3wPMOG06ngNZchafqap-FVRqplJCcUTALSagf-Iq4j-R6AE2raQkz5FtVq.png',
-                          height: 170,
-                          fit: BoxFit.contain),
-                    ),
-                    const SizedBox(height: 26),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 14, horizontal: 10),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30)),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            navItem(
-                                icon: Icons.fitness_center,
-                                title: "Exercise",
-                                active: true),
-                            navItem(
-                                icon: Icons.show_chart,
-                                title: "Progress",
-                                active: false),
-                            navItem(
-                                icon: Icons.people_outline,
-                                title: "Community",
-                                active: false),
-                            navItem(
-                                icon: Icons.person_outline,
-                                title: "Profile",
-                                active: false),
-                          ]),
-                    ),
-                    const SizedBox(height: 24),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text("Find the matching pairs to strengthen focus.",
+                    style: AppTextStyles.bodyMedium
+                        .copyWith(color: const Color(0xff6B7280))),
+                const SizedBox(height: 20),
+                // Grid البطاقات
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: 12,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () => _onCardTap(index),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        decoration: BoxDecoration(
+                          color: _matched[index]
+                              ? const Color(0xffDDF2DD)
+                              : _flipped[index]
+                                  ? Colors.white
+                                  : const Color(0xffD9E6FF),
+                          borderRadius: BorderRadius.circular(22),
+                          border: _matched[index]
+                              ? Border.all(
+                                  color: const Color(0xff0D6C1E), width: 2)
+                              : null,
+                        ),
+                        child: Center(
+                          child: _flipped[index] || _matched[index]
+                              ? Icon(_shuffledIcons[index],
+                                  color: _matched[index]
+                                      ? const Color(0xff0D6C1E)
+                                      : const Color(0xff934800),
+                                  size: 34)
+                              : const Icon(Icons.question_mark,
+                                  color: Color(0xff8EA2CC), size: 28),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                // Progress
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(children: [
+                    Text("Daily Goal: $_completedSessions/$_totalGoal Sessions",
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: LinearProgressIndicator(
+                        value: _totalGoal > 0
+                            ? (_completedSessions / _totalGoal).clamp(0.0, 1.0)
+                            : 0.0,
+                        minHeight: 8,
+                        backgroundColor: const Color(0xffDDDDDD),
+                        valueColor:
+                            const AlwaysStoppedAnimation(Color(0xff0D6C1E)),
+                      ),
+                    ),
+                  ]),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
     );
-  }
-
-  Widget gameCard(
-      {bool whiteCard = false,
-      Color? borderColor,
-      IconData? icon,
-      Color? iconColor}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: whiteCard ? Colors.white : const Color(0xffD9E6FF),
-        borderRadius: BorderRadius.circular(22),
-        border: whiteCard ? Border.all(color: borderColor!, width: 1.6) : null,
-      ),
-      child: Center(
-        child: whiteCard
-            ? Icon(icon, color: iconColor, size: 34)
-            : Container(
-                width: 42,
-                height: 42,
-                decoration: const BoxDecoration(
-                    color: Color(0xffC7D7F7), shape: BoxShape.circle),
-                child: const Icon(Icons.hexagon_outlined,
-                    size: 22, color: Color(0xff8EA2CC))),
-      ),
-    );
-  }
-
-  Widget navItem(
-      {required IconData icon, required String title, required bool active}) {
-    return Column(mainAxisSize: MainAxisSize.min, children: [
-      Container(
-        padding: active ? const EdgeInsets.all(14) : EdgeInsets.zero,
-        decoration: BoxDecoration(
-            color: active ? const Color(0xffF5E3CF) : Colors.transparent,
-            borderRadius: BorderRadius.circular(18)),
-        child: Icon(icon,
-            size: 22,
-            color: active ? const Color(0xff9A3412) : const Color(0xffA7AEC1)),
-      ),
-      const SizedBox(height: 6),
-      Text(title,
-          style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color:
-                  active ? const Color(0xff9A3412) : const Color(0xffA7AEC1))),
-    ]);
   }
 }

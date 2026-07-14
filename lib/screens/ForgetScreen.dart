@@ -19,7 +19,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
   Future<void> _sendResetLink() async {
     if (_emailController.text.trim().isEmpty) {
       setState(() {
-        _message = 'Please enter your email';
+        _message = 'الرجاء إدخال بريدك الإلكتروني';
         _isError = true;
       });
       return;
@@ -32,12 +32,12 @@ class _ForgetScreenState extends State<ForgetScreen> {
       await FirebaseAuth.instance
           .sendPasswordResetEmail(email: _emailController.text.trim());
       setState(() {
-        _message = 'Reset link sent! Check your email.';
+        _message = 'تم إرسال رابط إعادة التعيين! تحقق من بريدك الإلكتروني.';
         _isError = false;
       });
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       setState(() {
-        _message = e.message ?? 'Failed to send reset link';
+        _message = 'فشل إرسال رابط إعادة التعيين';
         _isError = true;
       });
     } finally {
@@ -72,11 +72,11 @@ class _ForgetScreenState extends State<ForgetScreen> {
                             color: Colors.white,
                             shape: BoxShape.circle,
                             border: Border.all(color: const Color(0xffE5E7EB))),
-                        child: const Icon(Icons.arrow_back,
+                        child: const Icon(Icons.arrow_forward,
                             color: Color(0xff4B5563))),
                   ),
                   const Spacer(),
-                  Text("Ta'afi",
+                  Text("تعافي",
                       style: AppTextStyles.headlineMedium.copyWith(
                           color: const Color(0xff934800),
                           fontWeight: FontWeight.bold,
@@ -112,20 +112,20 @@ class _ForgetScreenState extends State<ForgetScreen> {
                           child: const Icon(Icons.lock_reset,
                               color: Color(0xff934800), size: 28)),
                       const SizedBox(height: 36),
-                      Text("Forgot Password?",
+                      Text("نسيت كلمة المرور؟",
                           style: AppTextStyles.headlineLarge.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
                               color: const Color(0xff1F2328))),
                       const SizedBox(height: 14),
                       Text(
-                          "Don't worry, it happens. Enter your\nemail and we'll send you a secure\nlink to reset your access.",
+                          "لا تقلق، هذا يحدث. أدخل بريدك\nالإلكتروني وسنرسل لك رابطاً\nآمناً لإعادة تعيين الوصول.",
                           style: AppTextStyles.bodyMedium.copyWith(
                               color: const Color(0xff5B6472),
                               height: 1.8,
                               fontSize: 16)),
                       const SizedBox(height: 36),
-                      Text("Email Address",
+                      Text("البريد الإلكتروني",
                           style: AppTextStyles.bodyMedium.copyWith(
                               fontWeight: FontWeight.w700,
                               color: const Color(0xff414752))),
@@ -145,6 +145,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
                               child: TextField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
+                                  textDirection: TextDirection.ltr,
                                   decoration: InputDecoration(
                                       border: InputBorder.none,
                                       hintText: "name@example.com",
@@ -176,14 +177,14 @@ class _ForgetScreenState extends State<ForgetScreen> {
                                 _isLoading
                                     ? const CircularProgressIndicator(
                                         color: Colors.white, strokeWidth: 2)
-                                    : Text("Send Reset Link",
+                                    : Text("إرسال رابط إعادة التعيين",
                                         style: AppTextStyles.buttonText
                                             .copyWith(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold)),
                                 if (!_isLoading) ...[
                                   const SizedBox(width: 10),
-                                  const Icon(Icons.arrow_forward,
+                                  const Icon(Icons.arrow_back,
                                       color: Colors.white, size: 22)
                                 ],
                               ]),
@@ -194,9 +195,9 @@ class _ForgetScreenState extends State<ForgetScreen> {
                           child: TextButton.icon(
                         onPressed: () => Navigator.push(context,
                             MaterialPageRoute(builder: (_) => const Login())),
-                        icon: const Icon(Icons.arrow_back,
+                        icon: const Icon(Icons.arrow_forward,
                             size: 18, color: Color(0xff6B7280)),
-                        label: Text("Return to Login",
+                        label: Text("العودة لتسجيل الدخول",
                             style: AppTextStyles.bodyMedium.copyWith(
                                 color: const Color(0xff4B5563),
                                 fontWeight: FontWeight.w600)),
@@ -205,7 +206,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
                   ),
                 ),
                 const SizedBox(height: 80),
-                Text("DIGITAL SANCTUARY © 2024",
+                Text("ملاذ رقمي © 2024",
                     style: AppTextStyles.bodyMedium.copyWith(
                         color: const Color(0xffA1A1AA),
                         letterSpacing: 2,

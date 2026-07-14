@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_app/screens/Progress&Achievements.dart';
 import 'package:my_app/theme/app_theme.dart';
 import 'package:my_app/screens/ProfileScreen.dart';
+import 'package:my_app/screens/HomeDashboard.dart';
 
 class OfflineSaveScreen extends StatefulWidget {
   const OfflineSaveScreen({super.key});
@@ -112,9 +113,9 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
         where: 'id = ?',
         whereArgs: [1],
       );
-      setState(() => _syncMessage = 'Saved locally (offline) ✅');
+      setState(() => _syncMessage = 'تم الحفظ محلياً (دون اتصال) ✅');
     } catch (e) {
-      setState(() => _syncMessage = 'Error: $e');
+      setState(() => _syncMessage = 'خطأ: $e');
     }
   }
 
@@ -122,13 +123,13 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
     if (_database == null) return;
     setState(() {
       _isSyncing = true;
-      _syncMessage = 'Syncing...';
+      _syncMessage = 'جارِ المزامنة...';
     });
     try {
       String? uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) {
         setState(() {
-          _syncMessage = 'Please login first';
+          _syncMessage = 'الرجاء تسجيل الدخول أولاً';
           _isSyncing = false;
         });
         return;
@@ -157,19 +158,19 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
         'streak': FieldValue.increment(1),
       });
       setState(() {
-        _syncMessage = 'Synced ${unsynced.length} sessions to cloud! ✅';
+        _syncMessage = 'تمت مزامنة ${unsynced.length} جلسة مع السحابة! ✅';
         _isSyncing = false;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Synced to cloud successfully!'),
+              content: Text('تمت المزامنة مع السحابة بنجاح!'),
               backgroundColor: Color(0xff0D6C1E)),
         );
       }
     } catch (e) {
       setState(() {
-        _syncMessage = 'Sync failed: $e';
+        _syncMessage = 'فشلت المزامنة: $e';
         _isSyncing = false;
       });
     }
@@ -200,10 +201,29 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                       borderRadius: BorderRadius.circular(18)),
                   child: Row(
                     children: [
-                      const Icon(Icons.menu,
-                          color: Color(0xffC45A1A), size: 28),
+                      GestureDetector(
+                        onTap: () => Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const HomeDashboard()),
+                          (route) => false,
+                        ),
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_forward,
+                            color: Color(0xffC45A1A),
+                            size: 20,
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 14),
-                      Text("Taafi",
+                      Text("تعافي",
                           style: AppTextStyles.headlineMedium.copyWith(
                               color: const Color(0xffC45A1A),
                               fontWeight: FontWeight.bold,
@@ -224,16 +244,16 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                 ),
                 const SizedBox(height: 28),
                 const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Daily Physical Therapy",
+                    alignment: Alignment.centerRight,
+                    child: Text("العلاج الطبيعي اليومي",
                         style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold,
                             color: Color(0xff222222)))),
                 const SizedBox(height: 4),
                 const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Continue your progress from yesterday.",
+                    alignment: Alignment.centerRight,
+                    child: Text("أكملي تقدمك من الأمس.",
                         style:
                             TextStyle(fontSize: 13, color: Color(0xff414752)))),
                 const SizedBox(height: 22),
@@ -262,7 +282,7 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                             decoration: BoxDecoration(
                                 color: const Color(0xffDDF2DD),
                                 borderRadius: BorderRadius.circular(20)),
-                            child: const Text("IN PROGRESS",
+                            child: const Text("قيد التنفيذ",
                                 style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
@@ -271,14 +291,14 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      const Text("Finger Flexion Series",
+                      const Text("سلسلة ثني الأصابع",
                           style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               color: Color(0xff222222))),
                       const SizedBox(height: 12),
                       const Text(
-                          "Focus on slow, controlled movements\nto restore nerve connectivity.",
+                          "ركزي على حركات بطيئة ومتحكم بها\nلاستعادة الاتصال العصبي.",
                           style: TextStyle(
                               fontSize: 15,
                               height: 1.7,
@@ -286,7 +306,7 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                       const SizedBox(height: 24),
                       Row(
                         children: const [
-                          Text("Session Progress",
+                          Text("تقدم الجلسة",
                               style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w600)),
                           Spacer(),
@@ -325,12 +345,12 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                               const Icon(Icons.timer_outlined,
                                   color: Color(0xff2B66B1), size: 28),
                               const Spacer(),
-                              Text("${_activeTime}m",
+                              Text("$_activeTime د",
                                   style: const TextStyle(
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text("Active Time",
+                              const Text("الوقت النشط",
                                   style: TextStyle(
                                       fontSize: 13, color: Color(0xff2B66B1))),
                             ]),
@@ -355,7 +375,7 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text("Goal Sets",
+                              const Text("مجموعات الهدف",
                                   style: TextStyle(
                                       fontSize: 13, color: Color(0xff0D6C1E))),
                             ]),
@@ -369,8 +389,8 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _syncMessage.contains('Error') ||
-                              _syncMessage.contains('failed')
+                      color: _syncMessage.contains('خطأ') ||
+                              _syncMessage.contains('فشل')
                           ? Colors.red.shade50
                           : Colors.green.shade50,
                       borderRadius: BorderRadius.circular(12),
@@ -378,8 +398,8 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                     child: Text(_syncMessage,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: _syncMessage.contains('Error') ||
-                                    _syncMessage.contains('failed')
+                            color: _syncMessage.contains('خطأ') ||
+                                    _syncMessage.contains('فشل')
                                 ? Colors.red
                                 : Colors.green.shade800)),
                   ),
@@ -415,12 +435,12 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                    Text("Save Offline",
+                                    Text("حفظ دون اتصال",
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16)),
-                                    Text("حفظ محلي",
+                                    Text("يُحفظ على جهازك",
                                         style: TextStyle(
                                             color: Colors.white70,
                                             fontSize: 11)),
@@ -465,12 +485,12 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                    Text("Sync to Cloud",
+                                    Text("مزامنة مع السحابة",
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16)),
-                                    Text("مزامنة",
+                                    Text("رفع الجلسات المحفوظة",
                                         style: TextStyle(
                                             color: Colors.white70,
                                             fontSize: 11)),
@@ -500,12 +520,12 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                                     builder: (_) =>
                                         const ProgressAchievements()),
                                 (route) => false),
-                            child:
-                                bottomItem(Icons.home_outlined, "Home", false)),
+                            child: bottomItem(
+                                Icons.home_outlined, "الرئيسية", false)),
                         GestureDetector(
                             onTap: () {},
-                            child:
-                                bottomItem(Icons.hub_outlined, "Rehab", true)),
+                            child: bottomItem(
+                                Icons.hub_outlined, "التأهيل", true)),
                         GestureDetector(
                             onTap: () => Navigator.push(
                                 context,
@@ -513,14 +533,14 @@ class _OfflineSaveScreenState extends State<OfflineSaveScreen> {
                                     builder: (_) =>
                                         const ProgressAchievements())),
                             child: bottomItem(
-                                Icons.bar_chart_outlined, "Progress", false)),
+                                Icons.bar_chart_outlined, "التقدم", false)),
                         GestureDetector(
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) => const ProfileScreen())),
                             child: bottomItem(
-                                Icons.person_outline, "Profile", false)),
+                                Icons.person_outline, "الملف الشخصي", false)),
                       ]),
                 ),
                 const SizedBox(height: 24),

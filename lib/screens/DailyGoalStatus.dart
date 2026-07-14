@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_app/screens/ExerciseReminder.dart';
 import 'package:my_app/theme/app_theme.dart';
-import 'package:my_app/screens/ProfileScreen.dart';
 import 'package:my_app/screens/HomeDashboard.dart';
 import 'package:my_app/screens/PhysicalRehabExercises.dart';
 import 'package:my_app/screens/CognitiveGame.dart';
@@ -18,7 +16,7 @@ class DailyGoalStatus extends StatefulWidget {
 
 class _DailyGoalStatusState extends State<DailyGoalStatus> {
   int _completedSessions = 0;
-  int _totalSessions = 5;
+  final int _totalSessions = 5;
 
   @override
   void initState() {
@@ -30,12 +28,14 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
     try {
       String? uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) return;
+
+      DateTime now = DateTime.now();
+      DateTime startOfDay = DateTime(now.year, now.month, now.day);
+
       QuerySnapshot sessions = await FirebaseFirestore.instance
           .collection('sessions')
           .where('userId', isEqualTo: uid)
-          .where('completedAt',
-              isGreaterThanOrEqualTo:
-                  DateTime.now().subtract(const Duration(days: 1)))
+          .where('status', isEqualTo: 'completed')
           .get();
       setState(() => _completedSessions = sessions.docs.length);
     } catch (e) {
@@ -62,14 +62,14 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const ProfileScreen())),
+                              builder: (_) => const PhysicalRehabExercises())),
                       child: const CircleAvatar(
                           radius: 20,
                           backgroundImage:
                               AssetImage('assets/images/Avatar6.png')),
                     ),
                     const Spacer(),
-                    Text("Daily Progress",
+                    Text("التقدم اليومي",
                         style: AppTextStyles.headlineMedium.copyWith(
                             color: const Color(0xffEA580C),
                             fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const ExerciseReminder())),
+                              builder: (_) => const PhysicalRehabExercises())),
                       child: const Icon(Icons.notifications_none,
                           color: Color(0xff64748B), size: 28),
                     ),
@@ -99,8 +99,8 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                     const SizedBox(height: 30),
                     Text(
                       _completedSessions >= _totalSessions
-                          ? "Amazing! You've completed\nall your goals today!"
-                          : "Ready for your first step\ntowards recovery?",
+                          ? "رائع! لقد أكملتِ جميع\nأهدافك اليوم!"
+                          : "جاهزة لخطوتك الأولى\nنحو التعافي؟",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.headlineLarge.copyWith(
                           fontSize: 30,
@@ -109,8 +109,7 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                           color: const Color(0xff1A1C1C)),
                     ),
                     const SizedBox(height: 22),
-                    Text(
-                        "Your journey begins here. Every\nsmall movement counts toward\nyour strength.",
+                    Text("رحلتك تبدأ من هنا. كل حركة\nصغيرة تحسب لصالح قوتك.",
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyLarge.copyWith(
                             color: const Color(0xff414752),
@@ -121,7 +120,10 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const ExerciseReminder())),
+                              builder: (_) =>
+                                  _completedSessions >= _totalSessions
+                                      ? const ProgressAchievements()
+                                      : const PhysicalRehabExercises())),
                       child: Container(
                         width: double.infinity,
                         height: 76,
@@ -137,8 +139,8 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                         child: Center(
                             child: Text(
                                 _completedSessions >= _totalSessions
-                                    ? "VIEW PROGRESS"
-                                    : "START TODAY'S SESSION",
+                                    ? "عرض التقدم"
+                                    : "ابدئي جلسة اليوم",
                                 style: AppTextStyles.buttonText.copyWith(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -150,7 +152,7 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                       const Icon(Icons.info_outline,
                           size: 18, color: Color(0xff7B8190)),
                       const SizedBox(width: 8),
-                      Text("It takes only 10 minutes to begin",
+                      Text("يكفي 10 دقائق فقط للبدء",
                           style: AppTextStyles.bodyMedium.copyWith(
                               color: const Color(0xff7B8190), fontSize: 16)),
                     ]),
@@ -173,7 +175,7 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                   MaterialPageRoute(builder: (_) => const HomeDashboard()),
                   (route) => false),
               child: navItem(
-                  icon: Icons.home_outlined, title: "Home", active: false)),
+                  icon: Icons.home_outlined, title: "الرئيسية", active: false)),
           GestureDetector(
               onTap: () => Navigator.push(
                   context,
@@ -181,14 +183,14 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                       builder: (_) => const PhysicalRehabExercises())),
               child: navItem(
                   icon: Icons.back_hand_outlined,
-                  title: "Exercises",
+                  title: "التمارين",
                   active: false)),
           GestureDetector(
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const CognitiveGame())),
               child: navItem(
                   icon: Icons.extension_outlined,
-                  title: "Games",
+                  title: "الألعاب",
                   active: false)),
           GestureDetector(
               onTap: () => Navigator.push(
@@ -196,7 +198,7 @@ class _DailyGoalStatusState extends State<DailyGoalStatus> {
                   MaterialPageRoute(
                       builder: (_) => const ProgressAchievements())),
               child: navItem(
-                  icon: Icons.auto_graph, title: "Progress", active: true)),
+                  icon: Icons.auto_graph, title: "التقدم", active: true)),
         ]),
       ),
     );

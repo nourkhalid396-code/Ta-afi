@@ -11,12 +11,10 @@ class SuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffFAFAFA),
-
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(
@@ -31,47 +29,42 @@ class SuccessScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Text(
-                      "Ta'afi",
+                      "تعافي",
                       style: AppTextStyles.headlineMedium.copyWith(
                         color: const Color(0xffEA580C),
                         fontWeight: FontWeight.bold,
                         fontSize: 28,
                       ),
                     ),
-
                     GestureDetector(
-                    onTap: () {
-                     Navigator.push(
-                      context,
-                     MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                      child: const CircleAvatar(
+                        radius: 18,
+                        backgroundImage: AssetImage(
+                          'assets/images/Avatar4 .png',
+                        ),
                       ),
-                     );
-                    }, 
-                    child: const CircleAvatar(
-                     radius: 18,
-                      backgroundImage: AssetImage(
-                       'assets/images/Avatar4 .png',
-                      ),
-                     ),
                     ),
                   ],
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   children: [
-
                     const SizedBox(height: 24),
 
                     Stack(
                       alignment: Alignment.center,
                       children: [
-
                         Container(
                           width: 180,
                           height: 180,
@@ -80,7 +73,6 @@ class SuccessScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-
                         Container(
                           width: 165,
                           height: 165,
@@ -112,7 +104,7 @@ class SuccessScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                "ACCURACY",
+                                "الدقة",
                                 style: AppTextStyles.bodyMedium.copyWith(
                                   color: Colors.white,
                                   letterSpacing: 2,
@@ -129,7 +121,7 @@ class SuccessScreen extends StatelessWidget {
                     const SizedBox(height: 34),
 
                     Text(
-                      "AMAZING JOB,\nAMIRA!",
+                      "عمل رائع،\nأميرة!",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.headlineLarge.copyWith(
                         fontSize: 40,
@@ -142,7 +134,7 @@ class SuccessScreen extends StatelessWidget {
                     const SizedBox(height: 18),
 
                     Text(
-                      "You finished your session with\nexcellence.",
+                      "أنهيتِ جلستك بامتياز.",
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodyLarge.copyWith(
                         color: const Color(0xff414752),
@@ -171,7 +163,6 @@ class SuccessScreen extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-
                           Container(
                             width: 44,
                             height: 44,
@@ -184,22 +175,20 @@ class SuccessScreen extends StatelessWidget {
                               color: Color(0xff005FAF),
                             ),
                           ),
-
                           const SizedBox(width: 14),
-
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Session Time",
+                                  "وقت الجلسة",
                                   style: AppTextStyles.bodyMedium.copyWith(
                                     color: const Color(0xff414752),
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  "5 mins",
+                                  "5 دقائق",
                                   style: AppTextStyles.headlineMedium.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: const Color(0xff1A1C1C),
@@ -208,18 +197,17 @@ class SuccessScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 7,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xffD6FFD6), 
+                              color: const Color(0xffD6FFD6),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              "↗ Optimal",
+                              "↗ مثالي",
                               style: AppTextStyles.bodyMedium.copyWith(
                                 color: const Color(0xff0D6C1E),
                                 fontWeight: FontWeight.w700,
@@ -240,8 +228,8 @@ class SuccessScreen extends StatelessWidget {
                             icon: Icons.check_circle_outline,
                             iconBg: const Color(0xff9DF898),
                             iconColor: const Color(0xff0D6C1E),
-                            title: "Accuracy",
-                            value: "Excellent",
+                            title: "الدقة",
+                            value: "ممتازة",
                           ),
                         ),
                         const SizedBox(width: 14),
@@ -250,8 +238,8 @@ class SuccessScreen extends StatelessWidget {
                             icon: Icons.emoji_events_outlined,
                             iconBg: const Color(0xffFFDCC6),
                             iconColor: const Color(0xff934800),
-                            title: "Points Earned",
-                            value: "+20 pts",
+                            title: "النقاط المكتسبة",
+                            value: "+20 نقطة",
                           ),
                         ),
                       ],
@@ -277,7 +265,7 @@ class SuccessScreen extends StatelessWidget {
                         ),
                         child: const Center(
                           child: Text(
-                            "SEE MY PROGRESS",
+                            "شاهدي تقدمي",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 17,
@@ -290,34 +278,34 @@ class SuccessScreen extends StatelessWidget {
 
                     const SizedBox(height: 14),
                     GestureDetector(
-                     onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                    MaterialPageRoute(
-                       builder: (_) => const HomeDashboard(),
-                      ),
-                    );
-                  },
-                    child:Container(
-                      width: double.infinity,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xffC1C6D4),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HomeDashboard(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xffC1C6D4),
+                          ),
                         ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "BACK TO HOME",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff414752),
+                        child: const Center(
+                          child: Text(
+                            "العودة للرئيسية",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff414752),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                   ),
                     const SizedBox(height: 24),
 
                     Container(
@@ -330,7 +318,7 @@ class SuccessScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Text(
-                        "DAILY GOAL: 85%\nCOMPLETED",
+                        "الهدف اليومي: 85%\nمكتمل",
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyMedium.copyWith(
                           fontWeight: FontWeight.w700,

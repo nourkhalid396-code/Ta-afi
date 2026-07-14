@@ -9,28 +9,24 @@ class OTP extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF7F5F4),
-
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 24,
           ),
-
           child: Column(
             children: [
-
               const SizedBox(height: 12),
 
               // BACK BUTTON
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.centerRight,
                 child: IconButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-
                   icon: const Icon(
-                    Icons.arrow_back,
+                    Icons.arrow_forward,
                     color: Color(0xff934800),
                     size: 28,
                   ),
@@ -43,22 +39,20 @@ class OTP extends StatelessWidget {
               Container(
                 width: 96,
                 height: 96,
-
-              decoration: BoxDecoration(
-                color: Colors.white,
-               borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                 BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                   blurRadius: 12,
-                    offset: const Offset(0, 5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 5),
                     ),
-                   ],
-                  ),
-
+                  ],
+                ),
                 child: const Icon(
                   Icons.lock_person,
-                    color: Color(0xff934800),
+                  color: Color(0xff934800),
                   size: 46,
                 ),
               ),
@@ -67,9 +61,8 @@ class OTP extends StatelessWidget {
 
               // TITLE
               Text(
-                "Verify Your Email",
+                "تحقق من بريدك الإلكتروني",
                 textAlign: TextAlign.center,
-
                 style: AppTextStyles.headlineLarge.copyWith(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -81,9 +74,8 @@ class OTP extends StatelessWidget {
 
               // DESCRIPTION
               Text(
-                "Enter the 4-digit code sent to your email\naddress.",
+                "أدخل الرمز المكوّن من 4 أرقام المرسل إلى\nبريدك الإلكتروني.",
                 textAlign: TextAlign.center,
-
                 style: AppTextStyles.bodyLarge.copyWith(
                   color: const Color(0xff5A5F6A),
                   height: 1.6,
@@ -94,17 +86,11 @@ class OTP extends StatelessWidget {
 
               // OTP BOXES
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   otpBox(active: true),
-
                   otpBox(),
-
                   otpBox(),
-
                   otpBox(),
                 ],
               ),
@@ -115,24 +101,17 @@ class OTP extends StatelessWidget {
               RichText(
                 text: TextSpan(
                   children: [
-
                     TextSpan(
-                      text: "Code expires in ",
-                      style:
-                          AppTextStyles.bodyLarge.copyWith(
-                        color:
-                            const Color(0xff4B5563),
+                      text: "تنتهي صلاحية الرمز خلال ",
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: const Color(0xff4B5563),
                       ),
                     ),
-
                     TextSpan(
                       text: "00:54",
-                      style:
-                          AppTextStyles.bodyLarge.copyWith(
-                        color:
-                            const Color(0xff934800),
-                        fontWeight:
-                            FontWeight.bold,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: const Color(0xff934800),
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
@@ -142,7 +121,7 @@ class OTP extends StatelessWidget {
               const SizedBox(height: 12),
 
               Text(
-                "Resend Code",
+                "إعادة إرسال الرمز",
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: const Color(0xffD1D5DB),
                   fontWeight: FontWeight.w600,
@@ -153,81 +132,66 @@ class OTP extends StatelessWidget {
 
               // VERIFY BUTTON
               GestureDetector(
-               onTap: () {
-                Navigator.push(
-                 context,
-                MaterialPageRoute(
-                 builder: (context) => const NewPassword(),
-                ),
-               );
-              },
-               child: Container(
-                width: double.infinity,
-                height: 64,
-
-                decoration: BoxDecoration(             
-                 gradient: const LinearGradient(
-                  begin: Alignment.centerLeft,
-                   end: Alignment.centerRight,
-                   colors: [
-                   Color(0xff934800),
-                   Color(0xffB85C00),
-                  ],
-                 ),
-
-                  borderRadius:
-                      BorderRadius.circular(16),
-
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 5),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NewPassword(),
                     ),
-                  ],
-                ),
-
-                child: Center(
-                  child: Text(
-                    "VERIFY",
-
-                    style:
-                        AppTextStyles.buttonText.copyWith(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerRight,
+                      end: Alignment.centerLeft,
+                      colors: [
+                        Color(0xff934800),
+                        Color(0xffB85C00),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      "تحقق",
+                      style: AppTextStyles.buttonText.copyWith(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
               ),
-             ),
 
               const SizedBox(height: 60),
-           ],
+            ],
           ),
         ),
       ),
     );
   }
-   
 
   Widget otpBox({bool active = false}) {
     return Container(
       width: 68,
       height: 82,
-
       decoration: BoxDecoration(
         color: Colors.white,
-
         borderRadius: BorderRadius.circular(14),
-
         border: Border.all(
-          color: active
-              ? const Color(0xff934800)
-              : Colors.transparent,
+          color: active ? const Color(0xff934800) : Colors.transparent,
           width: 1.5,
         ),
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),

@@ -15,10 +15,11 @@ class ProgressAchievements extends StatefulWidget {
 }
 
 class _ProgressAchievementsState extends State<ProgressAchievements> {
-  String _userName = 'User';
+  String _userName = 'مستخدمة';
   int _totalMinutes = 0;
   int _streak = 0;
   int _totalSessions = 0;
+  List<int> _weeklyData = [0, 0, 0, 0, 0, 0, 0];
 
   @override
   void initState() {
@@ -36,24 +37,46 @@ class _ProgressAchievementsState extends State<ProgressAchievements> {
 
       if (userDoc.exists) {
         setState(() {
-          _userName = userDoc['fullName'] ?? 'User';
+          _userName = userDoc['fullName'] ?? 'مستخدمة';
           _streak = userDoc['streak'] ?? 0;
         });
       }
 
+      DateTime now = DateTime.now();
+      DateTime startOfDay = DateTime(now.year, now.month, now.day);
+
       QuerySnapshot sessions = await FirebaseFirestore.instance
           .collection('sessions')
           .where('userId', isEqualTo: uid)
+          .where('status', isEqualTo: 'completed') // ← الجديد
           .get();
-
       int totalSeconds = 0;
       for (var doc in sessions.docs) {
         totalSeconds += (doc['durationSeconds'] as int? ?? 0);
       }
 
+      // نحسب بيانات الأسبوع
+      List<int> weeklyData = [0, 0, 0, 0, 0, 0, 0];
+      DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+
+      for (var doc in sessions.docs) {
+        Timestamp? completedAt = doc['completedAt'] as Timestamp?;
+        if (completedAt != null) {
+          DateTime sessionDate = completedAt.toDate();
+          if (sessionDate
+              .isAfter(startOfWeek.subtract(const Duration(days: 1)))) {
+            int dayIndex = sessionDate.weekday - 1;
+            if (dayIndex >= 0 && dayIndex < 7) {
+              weeklyData[dayIndex]++;
+            }
+          }
+        }
+      }
+
       setState(() {
         _totalSessions = sessions.docs.length;
         _totalMinutes = (totalSeconds / 60).round();
+        _weeklyData = weeklyData;
       });
     } catch (e) {
       print('Error: $e');
@@ -76,38 +99,53 @@ class _ProgressAchievementsState extends State<ProgressAchievements> {
               Container(
                 width: double.infinity,
                 color: Colors.white,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ProfileScreen())),
-                        child: const CircleAvatar(
-                            radius: 22,
-                            backgroundImage:
-                                AssetImage('assets/images/Avatar8.png')),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: const Color(0xffFFEDD5), width: 2),
+                          ),
+                          child: GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const ProfileScreen())),
+                            child: ClipOval(
+                              child: Image.asset('assets/images/Avatar1 .png',
+                                  fit: BoxFit.cover),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text("تعافي",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff934800),
+                            )),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const ExerciseReminder())),
+                      child: const Icon(
+                        Icons.notifications_none,
+                        color: Color(0xff934800),
+                        size: 28,
                       ),
-                      const Spacer(),
-                      const Text("Ta'afi",
-                          style: TextStyle(
-                              color: Color(0xffF26A21),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold)),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (_) => const ExerciseReminder())),
-                        child: const Icon(Icons.notifications_none,
-                            color: Color(0xff4A4A4A), size: 28),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               Padding(
@@ -115,111 +153,112 @@ class _ProgressAchievementsState extends State<ProgressAchievements> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 30),
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          const TextSpan(
-                              text: "Your Weekly\n",
-                              style: TextStyle(
-                                  color: Color(0xff1E1E1E),
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.bold,
-                                  height: 1.2)),
-                          TextSpan(
-                              text: "Achievement",
-                              style: TextStyle(
-                                  color: const Color(0xff934800),
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.bold)),
-                        ],
+                    const SizedBox(height: 24),
+                    Text("مرحباً، $_userName",
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff1A1C1C),
+                        )),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "تقدّم تعافيك يبدو رائعاً!",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xff414752),
+                        height: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                        "You improved by ${_recoveryRate.toInt()}% this week! Your\nconsistency is paving the way for a full\nrecovery.",
-                        style: const TextStyle(
-                            color: Color(0xff414752),
-                            fontSize: 16,
-                            height: 1.6)),
                     const SizedBox(height: 28),
                     Container(
                       width: double.infinity,
-                      height: 250,
-                      padding: const EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
-                          color: const Color(0xffF3F1EF),
-                          borderRadius: BorderRadius.circular(26)),
+                        color: const Color(0xffFFEDD5),
+                        borderRadius: BorderRadius.circular(28),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text("ACTIVITY LEVEL",
-                                        style: TextStyle(
-                                            fontSize: 10,
-                                            letterSpacing: 1.2,
-                                            color: Color(0xff717783),
-                                            fontWeight: FontWeight.w700)),
-                                    SizedBox(height: 6),
-                                    Text("Last 7 Days",
-                                        style: TextStyle(
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xff222222))),
-                                  ]),
-                              const Spacer(),
-                              Row(children: [
-                                Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                        color: Color(0xffB55A13),
-                                        shape: BoxShape.circle)),
-                                const SizedBox(width: 6),
-                                Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                        color: Color(0xffE6CBB6),
-                                        shape: BoxShape.circle)),
-                              ]),
-                            ],
+                          Text("التقدم الأسبوعي",
+                              style: const TextStyle(
+                                color: Color(0xff934800),
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1,
+                                fontSize: 12,
+                              )),
+                          const SizedBox(height: 18),
+                          const Text("هذا الأسبوع",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff1A1C1C),
+                              )),
+                          const SizedBox(height: 14),
+                          Text(
+                            "أكملتِ $_totalSessions جلسة هذا الأسبوع. واصلي!",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xff414752),
+                              height: 1.5,
+                            ),
                           ),
-                          const SizedBox(height: 24),
-                          Expanded(
-                            child: Stack(
+                          const SizedBox(height: 28),
+                          // ✅ لفيناها بـ Directionality LTR عشان الرسمة
+                          // والأيام تحتها يتطابقوا صح دايماً
+                          Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: Column(
                               children: [
-                                Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: List.generate(
-                                        3,
-                                        (index) => Container(
-                                            height: 1,
-                                            color: Colors.grey.shade300))),
-                                Center(
-                                    child: CustomPaint(
-                                        size: const Size(double.infinity, 100),
-                                        painter: GraphPainter())),
+                                SizedBox(
+                                  height: 150,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Stack(
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: List.generate(
+                                                  3,
+                                                  (index) => Container(
+                                                      height: 1,
+                                                      color: Colors
+                                                          .grey.shade300)),
+                                            ),
+                                            Center(
+                                              child: CustomPaint(
+                                                size: const Size(
+                                                    double.infinity, 100),
+                                                painter: GraphPainter(
+                                                    weeklyData: _weeklyData),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: const [
+                                    Text("إثنين"),
+                                    Text("ثلاثاء"),
+                                    Text("أربعاء"),
+                                    Text("خميس"),
+                                    Text("جمعة"),
+                                    Text("سبت"),
+                                    Text("أحد"),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const [
-                                Text("MON"),
-                                Text("TUE"),
-                                Text("WED"),
-                                Text("THU"),
-                                Text("FRI"),
-                                Text("SAT"),
-                                Text("SUN")
-                              ]),
                         ],
                       ),
                     ),
@@ -230,24 +269,28 @@ class _ProgressAchievementsState extends State<ProgressAchievements> {
                           child: Container(
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                                color: const Color(0xffF4D6C3),
-                                borderRadius: BorderRadius.circular(24)),
+                              color: const Color(0xffF4D6C3),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
                             child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.timer_outlined,
-                                      color: Color(0xffB55A13)),
-                                  const SizedBox(height: 16),
-                                  Text("$_totalMinutes",
-                                      style: const TextStyle(
-                                          fontSize: 42,
-                                          fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  const Text("Minutes Active",
-                                      style: TextStyle(
-                                          color: Color(0xff723600),
-                                          fontSize: 14)),
-                                ]),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.timer_outlined,
+                                    color: Color(0xffB55A13)),
+                                const SizedBox(height: 16),
+                                Text("$_totalMinutes",
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xff1A1C1C),
+                                    )),
+                                const Text("إجمالي الدقائق",
+                                    style: TextStyle(
+                                      color: Color(0xff414752),
+                                      fontSize: 14,
+                                    )),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -255,104 +298,81 @@ class _ProgressAchievementsState extends State<ProgressAchievements> {
                           child: Container(
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                                color: const Color(0xffD9E4FF),
-                                borderRadius: BorderRadius.circular(24)),
+                              color: const Color(0xffD6E8D3),
+                              borderRadius: BorderRadius.circular(24),
+                            ),
                             child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.auto_awesome,
-                                      color: Color(0xff3366CC)),
-                                  const SizedBox(height: 16),
-                                  Text("${_recoveryRate.toInt()}%",
-                                      style: const TextStyle(
-                                          fontSize: 42,
-                                          fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  const Text("Recovery Rate",
-                                      style: TextStyle(
-                                          color: Color(0xff004786),
-                                          fontSize: 14)),
-                                ]),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.local_fire_department_outlined,
+                                    color: Color(0xff0D6C1E)),
+                                const SizedBox(height: 16),
+                                Text("$_streak",
+                                    style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xff1A1C1C),
+                                    )),
+                                const Text("أيام متتالية",
+                                    style: TextStyle(
+                                      color: Color(0xff414752),
+                                      fontSize: 14,
+                                    )),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 28),
-                    Row(children: const [
-                      Text("Badges",
-                          style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.bold)),
-                      Spacer(),
-                      Text("View All",
-                          style: TextStyle(
-                              color: Color(0xffB55A13),
-                              fontWeight: FontWeight.w600))
-                    ]),
-                    const SizedBox(height: 18),
-                    badgeCard(
-                        color: const Color(0xffFFE2D2),
-                        icon: Icons.local_fire_department,
-                        iconColor: const Color(0xffF08B52),
-                        title: "$_streak Day Streak",
-                        subtitle:
-                            "Consistent movement for ${_streak > 0 ? _streak : 'three'} consecutive days."),
-                    const SizedBox(height: 16),
-                    badgeCard(
-                        color: const Color(0xff0066C9),
-                        icon: Icons.workspace_premium,
-                        iconColor: Colors.white,
-                        title: "Consistency King",
-                        subtitle:
-                            "Completed every scheduled\nmorning exercise this week."),
-                    const SizedBox(height: 16),
-                    Opacity(
-                        opacity: 0.45,
-                        child: badgeCard(
-                            color: const Color(0xffD9DCE5),
-                            icon: Icons.lock_outline,
-                            iconColor: Colors.white,
-                            title: "Marathoner",
-                            subtitle:
-                                "${5 - _totalSessions > 0 ? 5 - _totalSessions : 0} sessions to go to unlock this\nachievement.")),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 24),
                     Container(
-                      height: 82,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24)),
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                                onTap: () => Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const HomeDashboard()),
-                                    (route) => false),
-                                child: bottomItem(Icons.home, "Home", false)),
-                            GestureDetector(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) =>
-                                            const PhysicalRehabExercises())),
-                                child: bottomItem(Icons.back_hand_outlined,
-                                    "Exercises", false)),
-                            GestureDetector(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const CognitiveGame())),
-                                child: bottomItem(
-                                    Icons.psychology_outlined, "Games", false)),
-                            GestureDetector(
-                                onTap: () {},
-                                child: bottomItem(
-                                    Icons.auto_graph, "Progress", true)),
-                          ]),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("معدل التعافي",
+                              style: const TextStyle(
+                                color: Color(0xff934800),
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1,
+                                fontSize: 12,
+                              )),
+                          const SizedBox(height: 18),
+                          const Text("التقدم الإجمالي",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xff1A1C1C),
+                              )),
+                          const SizedBox(height: 14),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: LinearProgressIndicator(
+                              value: _recoveryRate / 100,
+                              minHeight: 8,
+                              backgroundColor: const Color(0xffE5E7EB),
+                              valueColor: const AlwaysStoppedAnimation(
+                                Color(0xff934800),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            "معدل التعافي ${_recoveryRate.toStringAsFixed(0)}%",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xff414752),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -360,69 +380,75 @@ class _ProgressAchievementsState extends State<ProgressAchievements> {
           ),
         ),
       ),
+      bottomNavigationBar: Container(
+        height: 90,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: const BoxDecoration(color: Colors.white),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const HomeDashboard())),
+              child: navItem(icon: Icons.home, label: "الرئيسية"),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const PhysicalRehabExercises())),
+              child: navItem(icon: Icons.back_hand_outlined, label: "التمارين"),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const CognitiveGame())),
+              child: navItem(icon: Icons.psychology_outlined, label: "الألعاب"),
+            ),
+            GestureDetector(
+              onTap: () =>
+                  Navigator.popUntil(context, (route) => route.isFirst),
+              child: navItem(
+                  icon: Icons.auto_graph, label: "التقدم", active: true),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget badgeCard(
-      {required Color color,
-      required IconData icon,
-      required Color iconColor,
-      required String title,
-      required String subtitle}) {
+  Widget navItem(
+      {required IconData icon, required String label, bool active = false}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: 82,
+      height: 58,
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4))
-          ]),
-      child: Row(children: [
-        Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            child: Icon(icon, color: iconColor)),
-        const SizedBox(width: 16),
-        Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title,
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          const SizedBox(height: 6),
-          Text(subtitle,
-              style: const TextStyle(
-                  color: Color(0xff777777), fontSize: 13, height: 1.4)),
-        ])),
-      ]),
-    );
-  }
-
-  Widget bottomItem(IconData icon, String title, bool active) {
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Container(
-          padding: active ? const EdgeInsets.all(12) : EdgeInsets.zero,
-          decoration: BoxDecoration(
-              color: active ? const Color(0xffF7E2D3) : Colors.transparent,
-              borderRadius: BorderRadius.circular(18)),
-          child: Icon(icon,
+        color: active ? const Color(0xffFFEDD5) : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon,
               color:
-                  active ? const Color(0xffC16A28) : const Color(0xff8A8A8A))),
-      const SizedBox(height: 6),
-      Text(title,
-          style: TextStyle(
-              fontSize: 11,
-              color: active ? const Color(0xffC16A28) : const Color(0xff8A8A8A),
-              fontWeight: active ? FontWeight.bold : FontWeight.w500)),
-    ]);
+                  active ? const Color(0xff9A3412) : const Color(0xffA1A1AA)),
+          const SizedBox(height: 4),
+          Text(label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color:
+                    active ? const Color(0xff9A3412) : const Color(0xffA1A1AA),
+              )),
+        ],
+      ),
+    );
   }
 }
 
 class GraphPainter extends CustomPainter {
+  final List<int> weeklyData;
+
+  GraphPainter({required this.weeklyData});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -430,18 +456,60 @@ class GraphPainter extends CustomPainter {
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
+
     final path = Path();
-    path.moveTo(0, size.height * 0.6);
-    path.quadraticBezierTo(size.width * 0.2, size.height * 0.4,
-        size.width * 0.4, size.height * 0.55);
-    path.quadraticBezierTo(size.width * 0.6, size.height * 0.75,
-        size.width * 0.8, size.height * 0.2);
-    path.quadraticBezierTo(size.width * 0.9, 0, size.width, size.height * 0.15);
+
+    // نرسم خط حسب البيانات الحقيقية
+    if (weeklyData.isNotEmpty && weeklyData.any((d) => d > 0)) {
+      double maxData = weeklyData.reduce((a, b) => a > b ? a : b).toDouble();
+      if (maxData == 0) maxData = 1;
+
+      double stepX = size.width / (weeklyData.length - 1);
+
+      for (int i = 0; i < weeklyData.length; i++) {
+        double x = i * stepX;
+        double y = size.height -
+            (weeklyData[i] / maxData * size.height * 0.8) -
+            (size.height * 0.1);
+
+        if (i == 0) {
+          path.moveTo(x, y);
+        } else {
+          path.lineTo(x, y);
+        }
+      }
+    } else {
+      // خط افتراضي لو ما فيه بيانات
+      path.moveTo(0, size.height * 0.6);
+      path.quadraticBezierTo(size.width * 0.2, size.height * 0.4,
+          size.width * 0.4, size.height * 0.55);
+      path.quadraticBezierTo(size.width * 0.6, size.height * 0.75,
+          size.width * 0.8, size.height * 0.2);
+      path.quadraticBezierTo(
+          size.width * 0.9, 0, size.width, size.height * 0.15);
+    }
+
     canvas.drawPath(path, paint);
+
+    // نرسم النقاط
     final dotPaint = Paint()..color = const Color(0xffB55A13);
-    canvas.drawCircle(Offset(size.width, size.height * 0.15), 6, dotPaint);
+    if (weeklyData.isNotEmpty) {
+      double maxData = weeklyData.reduce((a, b) => a > b ? a : b).toDouble();
+      if (maxData == 0) maxData = 1;
+      double stepX = size.width / (weeklyData.length - 1);
+
+      for (int i = 0; i < weeklyData.length; i++) {
+        double x = i * stepX;
+        double y = size.height -
+            (weeklyData[i] / maxData * size.height * 0.8) -
+            (size.height * 0.1);
+        canvas.drawCircle(Offset(x, y), 6, dotPaint);
+      }
+    } else {
+      canvas.drawCircle(Offset(size.width, size.height * 0.15), 6, dotPaint);
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

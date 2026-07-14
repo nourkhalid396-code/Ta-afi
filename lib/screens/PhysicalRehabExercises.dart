@@ -19,35 +19,49 @@ class PhysicalRehabExercises extends StatefulWidget {
 class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
   String _selectedCategory = 'All';
   bool _isLoading = false;
+  bool _isFetching = true;
 
-  final List<Map<String, dynamic>> _exercises = [
-    {
-      'id': 'finger_extensions',
-      'title': 'Finger\nExtensions',
-      'subtitle': 'Releasing tension and\nimproving span.',
-      'duration': '5 mins',
-      'image': 'assets/images/hand2.png',
-      'category': 'Mobility'
-    },
-    {
-      'id': 'wrist_rotations',
-      'title': 'Wrist Rotations',
-      'subtitle': 'Enhancing circular range of\nmotion.',
-      'duration': '8 mins',
-      'image': 'assets/images/hand3.png',
-      'category': 'Mobility'
-    },
-    {
-      'id': 'grip_strengthening',
-      'title': 'Grip\nStrengthening',
-      'subtitle': 'Building foundational muscle\npower.',
-      'duration': '12 mins',
-      'image': 'assets/images/hand4.png',
-      'category': 'Strength'
-    },
-  ];
+  List<Map<String, dynamic>> _exercises = [];
 
-  Future<void> _startExercise(String exerciseId) async {
+  @override
+  void initState() {
+    super.initState();
+    _fetchExercises();
+  }
+
+  Future<void> _fetchExercises() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('exercises').get();
+
+      List<Map<String, dynamic>> exercises = [];
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data();
+        if (data['category'] != 'physical_therapy') continue;
+        exercises.add({
+          'id': doc.id,
+          'title': data['title'] ?? 'تمرين',
+          'subtitle': data['subtitle'] ?? data['description'] ?? '',
+          'duration': '${data['durationMinutes'] ?? 10} دقيقة',
+          'image': 'assets/images/${data['image'] ?? 'hand2.png'}',
+          'category': data['subcategory'] ?? 'Mobility',
+          'videoFile': data['videoFile'] ?? '',
+        });
+      }
+
+      setState(() {
+        _exercises = exercises;
+        _isFetching = false;
+      });
+    } catch (e) {
+      print('Error fetching exercises: $e');
+      setState(() => _isFetching = false);
+    }
+  }
+
+  Future<void> _startExercise(
+      String exerciseId, String title, String videoFile) async {
     setState(() => _isLoading = true);
     try {
       String? uid = FirebaseAuth.instance.currentUser?.uid;
@@ -58,9 +72,18 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
         'startedAt': FieldValue.serverTimestamp(),
         'status': 'in_progress',
       });
-      if (mounted)
+      if (mounted) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const CameraSetup()));
+          context,
+          MaterialPageRoute(
+            builder: (_) => CameraSetup(
+              exerciseId: exerciseId,
+              exerciseTitle: title,
+              videoFile: videoFile,
+            ),
+          ),
+        );
+      }
     } catch (e) {
       print('Error: $e');
     } finally {
@@ -104,7 +127,7 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                                   fit: BoxFit.cover))),
                     ),
                     const SizedBox(width: 8),
-                    Text("Ta'afi",
+                    Text("تعافي",
                         style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.primaryColor,
                             fontWeight: FontWeight.bold)),
@@ -129,13 +152,13 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                     RichText(
                       text: TextSpan(children: [
                         TextSpan(
-                            text: "Daily ",
+                            text: "الحركة ",
                             style: AppTextStyles.headlineLarge.copyWith(
                                 fontSize: 40,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xff1A1C1C))),
                         TextSpan(
-                            text: "Motion",
+                            text: "اليومية",
                             style: AppTextStyles.headlineLarge.copyWith(
                                 fontSize: 40,
                                 fontWeight: FontWeight.w800,
@@ -144,7 +167,7 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                        "Focused physical therapy designed\nto restore hand dexterity and wrist\nmobility through gentle, progressive\nmovements.",
+                        "علاج طبيعي مركّز مصمم لاستعادة\nمهارة اليد وحركة الرسغ من خلال\nحركات لطيفة وتدريجية.",
                         style: AppTextStyles.bodyMedium.copyWith(
                             height: 1.8,
                             fontSize: 14,
@@ -155,19 +178,19 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                       child: Row(
                         children: [
                           filterButton(
-                              title: "All Exercises",
+                              title: "كل التمارين",
                               active: _selectedCategory == 'All',
                               onTap: () =>
                                   setState(() => _selectedCategory = 'All')),
                           const SizedBox(width: 10),
                           filterButton(
-                              title: "Mobility",
+                              title: "الحركة",
                               active: _selectedCategory == 'Mobility',
                               onTap: () => setState(
                                   () => _selectedCategory = 'Mobility')),
                           const SizedBox(width: 10),
                           filterButton(
-                              title: "Strength",
+                              title: "القوة",
                               active: _selectedCategory == 'Strength',
                               onTap: () => setState(
                                   () => _selectedCategory = 'Strength')),
@@ -175,11 +198,36 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                       ),
                     ),
                     const SizedBox(height: 26),
-                    ..._filteredExercises.map((exercise) => Padding(
-                          padding: const EdgeInsets.only(bottom: 20),
-                          child: exerciseCard(
-                              context: context, exercise: exercise),
-                        )),
+                    _isFetching
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(40),
+                              child: CircularProgressIndicator(
+                                color: Color(0xff934800),
+                              ),
+                            ),
+                          )
+                        : _filteredExercises.isEmpty
+                            ? const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.all(40),
+                                  child: Text(
+                                    'لا توجد تمارين',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                ),
+                              )
+                            : Column(
+                                children: _filteredExercises
+                                    .map((exercise) => Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 20),
+                                          child: exerciseCard(
+                                              context: context,
+                                              exercise: exercise),
+                                        ))
+                                    .toList(),
+                              ),
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -201,17 +249,17 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                   MaterialPageRoute(builder: (_) => const HomeDashboard()),
                   (route) => false),
               child: navItem(
-                  icon: Icons.home_outlined, title: "Home", active: false)),
+                  icon: Icons.home_outlined, title: "الرئيسية", active: false)),
           GestureDetector(
               onTap: () {},
               child: navItem(
-                  icon: Icons.back_hand, title: "Exercises", active: true)),
+                  icon: Icons.back_hand, title: "التمارين", active: true)),
           GestureDetector(
               onTap: () => Navigator.push(context,
                   MaterialPageRoute(builder: (_) => const CognitiveGame())),
               child: navItem(
                   icon: Icons.psychology_outlined,
-                  title: "Games",
+                  title: "الألعاب",
                   active: false)),
           GestureDetector(
               onTap: () => Navigator.push(
@@ -219,7 +267,7 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
                   MaterialPageRoute(
                       builder: (_) => const ProgressAchievements())),
               child: navItem(
-                  icon: Icons.auto_graph, title: "Progress", active: false)),
+                  icon: Icons.auto_graph, title: "التقدم", active: false)),
         ]),
       ),
     );
@@ -262,7 +310,7 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
             ),
             Positioned(
               top: 12,
-              left: 12,
+              right: 12,
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -304,16 +352,17 @@ class _PhysicalRehabExercisesState extends State<PhysicalRehabExercises> {
               ),
             ),
             GestureDetector(
-              onTap: _isLoading ? null : () => _startExercise(exercise['id']),
+              onTap: () => _startExercise(
+                exercise['id'],
+                exercise['title'],
+                exercise['videoFile'] ?? '',
+              ),
               child: Container(
                 width: 42,
                 height: 42,
                 decoration: const BoxDecoration(
                     color: Color(0xff934800), shape: BoxShape.circle),
-                child: _isLoading
-                    ? const CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2)
-                    : const Icon(Icons.play_arrow, color: Colors.white),
+                child: const Icon(Icons.play_arrow, color: Colors.white),
               ),
             ),
           ],

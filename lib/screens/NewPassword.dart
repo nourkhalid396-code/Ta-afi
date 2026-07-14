@@ -40,7 +40,7 @@ class NewPassword extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Ta’afi',
+                  'تعافي',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
@@ -73,7 +73,7 @@ class NewPassword extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       const Text(
-                        'Create New Password',
+                        'إنشاء كلمة مرور جديدة',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -92,13 +92,14 @@ class NewPassword extends StatelessWidget {
                         ),
                         child: const TextField(
                           obscureText: true,
+                          textDirection: TextDirection.ltr,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             prefixIcon: Icon(
                               Icons.lock_outline,
                               color: Color(0xFF7A7F8A),
                             ),
-                            hintText: 'Create Password',
+                            hintText: 'أنشئ كلمة مرور',
                             hintStyle: TextStyle(
                               color: Color(0xFF7A7F8A),
                             ),
@@ -117,13 +118,14 @@ class NewPassword extends StatelessWidget {
                         ),
                         child: const TextField(
                           obscureText: true,
+                          textDirection: TextDirection.ltr,
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             prefixIcon: Icon(
                               Icons.lock_outline,
                               color: Color(0xFF7A7F8A),
                             ),
-                            hintText: 'Confirm Password',
+                            hintText: 'تأكيد كلمة المرور',
                             hintStyle: TextStyle(
                               color: Color(0xFF7A7F8A),
                             ),
@@ -134,55 +136,55 @@ class NewPassword extends StatelessWidget {
                       const Spacer(),
 
                       // Create Button
-                     SizedBox(
-                      width: double.infinity,
-                       height: 64,
-                       child: DecoratedBox(
-                        decoration: BoxDecoration(
-                         borderRadius: BorderRadius.circular(20),
-                          gradient: const LinearGradient(
-                           begin: Alignment.centerLeft,
-                           end: Alignment.centerRight,
-                           colors: [
-                            Color(0xFF934800), 
-                             Color(0xFFB85C00), 
-                             ],
+                      SizedBox(
+                        width: double.infinity,
+                        height: 64,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: const LinearGradient(
+                              begin: Alignment.centerRight,
+                              end: Alignment.centerLeft,
+                              colors: [
+                                Color(0xFF934800),
+                                Color(0xFFB85C00),
+                              ],
                             ),
                             boxShadow: const [
-                             BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
-                             ),
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
                             ],
-                           ),
+                          ),
                           child: ElevatedButton(
-                           onPressed: () {
-                            Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                             builder: (context) => const Login(),
-                           ),
-                          );
-                         },
-                         style: ElevatedButton.styleFrom(
-                         backgroundColor: Colors.transparent,
-                         shadowColor: Colors.transparent,
-                         shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(20),
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Login(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text(
+                              'إنشاء',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
-                       ),
-                       child: const Text(
-                         'Create',
-                       style: TextStyle(
-                        fontSize: 28,
-                         fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                         ),
-                        ),
-                       ),
                       ),
-                     ),
 
                       const SizedBox(height: 20),
                     ],
